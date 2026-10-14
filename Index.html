@@ -1,11 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bg">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Градски Транспорт</title>
+    <link rel="stylesheet" href="main.css">
 </head>
 <body>
-    
+
+    <!-- 1. Главна навигация -->
+    <header>
+        <!-- Блок за лого и заглавие (горе вляво) -->
+        <div class="brand">
+            <img src="tran.svg" alt="Лого на Градски Транспорт" class="logo">
+            <h2>Градски Транспорт</h2>
+        </div>
+
+        <nav>
+            <a href="index.html">Начало</a>
+            <a href="plan.html">Планиране</a>
+            <a href="lines.html">Линии</a>
+            <a href="stops.html">Спирки</a>
+            <a href="schedules.html">Разписания</a>
+            <a href="contact.html">Контакти</a>
+        </nav>
+    </header>
+
+    <hr>
+
+    <!-- 2. Основна част -->
+    <main>
+        <!-- Търсачка -->
+        <section>
+            <h3>Търсене на транспорт</h3>
+            <form action="search.php" method="GET">
+                <input type="text" name="query" placeholder="Въведете линия или спирка...">
+                <button type="submit">Търси</button>
+            </form>
+        </section>
+
+        <br>
+
+        <!-- Бързи връзки -->
+        <section>
+            <h3>Бърз достъп</h3>
+            <ul>
+                <li><a href="plan.html">Планирайте вашето пътуване</a></li>
+                <li><a href="lines.html">Преглед на всички линии</a></li>
+                <li><a href="stops.html">Преглед на всички спирки</a></li>
+                <li><a href="schedules.html">Разписания по часове</a></li>
+            </ul>
+        </section>
+
+        <br>
+
+        <!-- Текст за добре дошли -->
+        <section>
+            <h3>Добре дошли</h3>
+            <p>Добре дошли в официалната система за информация на градския транспорт. Тук можете бързо да откриете разписания, маршрути и да планирате пътуването си.</p>
+        </section>
+    </main>
+
+    <hr>
+
+    <!-- 3. Футър -->
+    <footer>
+        <p>&copy; 2026 Градски Транспорт - Екип 1, XII "В" клас</p>
+    </footer>
+
 </body>
 </html>

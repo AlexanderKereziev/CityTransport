@@ -1,0 +1,209 @@
+/* ==========================================
+   1. ОБЩИ СТИЛОВЕ И ОСНОВНИ НАСТРОЙКИ
+   ========================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333333;
+    background-color: #f4f7f6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Изчистване на хоризонталните линии (hr) */
+hr {
+    border: 0;
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 10px 0;
+}
+
+/* ==========================================
+   2. ХЕДЪР, ЛОГО И НАВИГАЦИЯ
+   ========================================== */
+header {
+    background-color: #004b87; /* Тъмно синьо за транспортен проект */
+    color: #ffffff;
+    padding: 15px 4%; /* Намален страничен отстъп за повече място */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Контейнер за лого и заглавие (горе вляво) */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* Разстояние между логото и текста */
+    flex-shrink: 0; /* Гарантира, че няма да се свива */
+}
+
+.logo {
+    height: 45px; /* Височина на логото */
+    width: auto;
+    object-fit: contain;
+}
+
+header h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0;
+    white-space: nowrap;
+}
+
+nav {
+    display: flex;
+    gap: 6px; /* Разстояние между бутоните */
+    align-items: center;
+    white-space: nowrap; /* Гарантира показването на един ред */
+}
+
+nav a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem; /* Оптимален размер за събиране на един ред */
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+nav a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ==========================================
+   3. ОСНОВНО СЪДЪРЖАНИЕ (MAIN CONTENT)
+   ========================================== */
+main {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 20px;
+    flex: 1; /* Разширява main, за да натисне футъра най-долу */
+}
+
+/* Контейнери за секциите */
+section {
+    background-color: #ffffff;
+    padding: 25px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+section h3 {
+    color: #004b87;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #28a745; /* Зелена подчертаваща линия */
+    padding-bottom: 5px;
+    display: inline-block;
+}
+
+/* 3.1 Форма за търсене */
+section form {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+section form input[type="text"] {
+    flex: 1;
+    padding: 12px 15px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+}
+
+section form input[type="text"]:focus {
+    border-color: #004b87;
+}
+
+section form button {
+    background-color: #28a745; /* Зелен бутон за търсене */
+    color: #ffffff;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+section form button:hover {
+    background-color: #218838;
+}
+
+/* 3.2 Списък с бързи връзки */
+section ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+section ul li {
+    margin-bottom: 10px;
+}
+
+section ul li a {
+    color: #004b87;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-block;
+    padding: 5px 0;
+    transition: color 0.2s ease;
+}
+
+section ul li a:hover {
+    color: #28a745;
+    text-decoration: underline;
+}
+
+/* ==========================================
+   4. ФУТЪР (FOOTER)
+   ========================================== */
+footer {
+    background-color: #1c252e;
+    color: #bbbbbb;
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9rem;
+    margin-top: auto;
+}
+
+/* ==========================================
+   5. АДАПТИВНОСТ ЗА МОБИЛНИ УСТРОЙСТВА
+   ========================================== */
+@media (max-width: 850px) {
+    header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .brand {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    nav {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    section form {
+        flex-direction: column;
+    }
+
+    section form button {
+        width: 100%;
+    }
+}
