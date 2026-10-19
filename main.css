@@ -1,6 +1,3 @@
-/* ==========================================
-   1. ОБЩИ СТИЛОВЕ И ОСНОВНИ НАСТРОЙКИ
-   ========================================== */
 * {
     margin: 0;
     padding: 0;
@@ -31,7 +28,7 @@ hr {
 header {
     background-color: #004b87; /* Тъмно синьо за транспортен проект */
     color: #ffffff;
-    padding: 15px 4%; /* Намален страничен отстъп за повече място */
+    padding: 15px 4%; /* Намален страничен отстъп за събиране на един ред */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -42,12 +39,12 @@ header {
 .brand {
     display: flex;
     align-items: center;
-    gap: 12px; /* Разстояние между логото и текста */
+    gap: 12px;
     flex-shrink: 0; /* Гарантира, че няма да се свива */
 }
 
 .logo {
-    height: 45px; /* Височина на логото */
+    height: 45px;
     width: auto;
     object-fit: contain;
 }
@@ -61,7 +58,7 @@ header h2 {
 
 nav {
     display: flex;
-    gap: 6px; /* Разстояние между бутоните */
+    gap: 6px;
     align-items: center;
     white-space: nowrap; /* Гарантира показването на един ред */
 }
@@ -70,13 +67,14 @@ nav a {
     color: #ffffff;
     text-decoration: none;
     font-weight: 500;
-    font-size: 0.95rem; /* Оптимален размер за събиране на един ред */
+    font-size: 0.95rem;
     padding: 6px 12px;
     border-radius: 4px;
     transition: background-color 0.3s ease;
 }
 
-nav a:hover {
+nav a:hover,
+nav a.active {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
@@ -107,14 +105,15 @@ section h3 {
     display: inline-block;
 }
 
-/* 3.1 Форма за търсене */
+/* 3.1 Стандартни форми и входни полета */
 section form {
     display: flex;
     gap: 10px;
     margin-top: 10px;
 }
 
-section form input[type="text"] {
+section form input[type="text"],
+section form input[type="time"] {
     flex: 1;
     padding: 12px 15px;
     border: 1px solid #cccccc;
@@ -123,12 +122,14 @@ section form input[type="text"] {
     outline: none;
 }
 
-section form input[type="text"]:focus {
+section form input[type="text"]:focus,
+section form input[type="time"]:focus {
     border-color: #004b87;
 }
 
-section form button {
-    background-color: #28a745; /* Зелен бутон за търсене */
+section form button,
+.btn-plan {
+    background-color: #28a745; /* Зелен бутон */
     color: #ffffff;
     border: none;
     padding: 12px 25px;
@@ -137,13 +138,121 @@ section form button {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    white-space: nowrap;
 }
 
-section form button:hover {
+section form button:hover,
+.btn-plan:hover {
     background-color: #218838;
 }
 
-/* 3.2 Списък с бързи връзки */
+/* 3.2 Втора форма на началната страница (index.html) */
+.route-form {
+    flex-direction: column;
+}
+
+.route-form .form-inputs {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+/* 3.3 Форма в страницата за Планиране (plan.html) */
+.planner-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.planner-inputs {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 2;
+    min-width: 200px;
+}
+
+.input-group.short {
+    flex: 1;
+    min-width: 130px;
+}
+
+.input-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #004b87;
+}
+
+/* 3.4 Карти за намерени маршрути (plan.html) */
+.route-card {
+    border: 1px solid #e0e0e0;
+    border-left: 5px solid #004b87;
+    border-radius: 6px;
+    padding: 15px 20px;
+    margin-top: 15px;
+    background-color: #fafafa;
+}
+
+.route-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 4px;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.badge.line-bus {
+    background-color: #004b87;
+}
+
+.badge.line-trolley {
+    background-color: #17a2b8;
+}
+
+.route-time {
+    font-weight: bold;
+    color: #28a745;
+    font-size: 0.95rem;
+}
+
+.route-details p {
+    margin-bottom: 5px;
+    font-size: 0.95rem;
+}
+
+.route-stops-count {
+    color: #666666;
+    font-size: 0.85rem;
+}
+
+.btn-details {
+    display: inline-block;
+    margin-top: 10px;
+    color: #004b87;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.btn-details:hover {
+    text-decoration: underline;
+}
+
+/* 3.5 Списък с бързи връзки */
 section ul {
     list-style: none;
     padding-left: 0;
@@ -199,11 +308,18 @@ footer {
         justify-content: center;
     }
 
-    section form {
+    section form,
+    .route-form .form-inputs,
+    .planner-inputs {
         flex-direction: column;
     }
 
-    section form button {
+    .input-group {
+        width: 100%;
+    }
+
+    section form button,
+    .btn-plan {
         width: 100%;
     }
 }

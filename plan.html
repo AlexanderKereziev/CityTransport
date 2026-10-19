@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Планиране на пътуване - Градски Транспорт</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+
+    <!-- 1. Главна навигация -->
+    <header>
+        <div class="brand">
+            <img src="images/logo.svg" alt="Лого на Градски Транспорт" class="logo">
+            <h2>Градски Транспорт</h2>
+        </div>
+
+        <nav>
+            <a href="index.html">Начало</a>
+            <a href="plan.html" class="active">Планиране</a>
+            <a href="lines.html">Линии</a>
+            <a href="stops.html">Спирки</a>
+            <a href="schedules.html">Разписания</a>
+            <a href="contact.html">Контакти</a>
+        </nav>
+    </header>
+
+    <hr>
+
+    <!-- 2. Основна част за планиране -->
+    <main>
+        <!-- Секция с форма за планиране -->
+        <section class="planner-section">
+            <h3>Планирайте своето пътуване</h3>
+            <p>Въведете началната и крайната спирка, за да намерите най-удобния маршрут и линия.</p>
+            
+            <form action="plan.html" method="GET" class="planner-form">
+                <div class="planner-inputs">
+                    <div class="input-group">
+                        <label for="from_stop">Начална спирка (От):</label>
+                        <input type="text" id="from_stop" name="from_stop" placeholder="напр. Централна гара" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="to_stop">Крайна спирка (До):</label>
+                        <input type="text" id="to_stop" name="to_stop" placeholder="напр. Университет" required>
+                    </div>
+
+                    <div class="input-group short">
+                        <label for="travel_time">Час на тръгване:</label>
+                        <input type="time" id="travel_time" name="travel_time">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-plan">Търси маршрут</button>
+            </form>
+        </section>
+
+        <!-- Пример за резултат от търсенето (структура за показване на данни) -->
+        <section class="results-section">
+            <h3>Предложени маршрути</h3>
+            
+            <div class="route-card">
+                <div class="route-header">
+                    <span class="badge line-bus">Автобус 1</span>
+                    <span class="route-time">Времетраене: ~15 мин.</span>
+                </div>
+                <div class="route-details">
+                    <p><strong>От:</strong> Централна гара (10:15 ч.)</p>
+                    <p><strong>До:</strong> Университет (10:30 ч.)</p>
+                    <p class="route-stops-count">Брой спирки по маршрута: 5 спирки</p>
+                </div>
+                <a href="schedules.html" class="btn-details">Виж пълното разписание</a>
+            </div>
+
+            <div class="route-card">
+                <div class="route-header">
+                    <span class="badge line-trolley">Тролей 2</span>
+                    <span class="route-time">Времетраене: ~20 мин.</span>
+                </div>
+                <div class="route-details">
+                    <p><strong>От:</strong> Централна гара (10:20 ч.)</p>
+                    <p><strong>До:</strong> Университет (10:40 ч.)</p>
+                    <p class="route-stops-count">Брой спирки по маршрута: 7 спирки</p>
+                </div>
+                <a href="schedules.html" class="btn-details">Виж пълното разписание</a>
+            </div>
+        </section>
+    </main>
+
+    <hr>
+
+    <!-- 3. Футър -->
+    <footer>
+        <p>&copy; 2026 Градски Транспорт - Екип 1, XII "В" клас</p>
+    </footer>
+
+</body>
+</html>
