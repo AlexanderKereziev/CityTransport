@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="tran.svg" type="image/svg+xml">
+    <title>Разписания - Градски Транспорт</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+
+    <!-- 1. Главна навигация -->
+    <header>
+        <div class="brand">
+            <img src="tran.svg" alt="Лого на Градски Транспорт" class="logo">
+            <h2>Градски Транспорт</h2>
+        </div>
+
+        <nav>
+            <a href="index.html">Начало</a>
+            <a href="plan.html">Планиране</a>
+            <a href="lines.html">Линии</a>
+            <a href="stops.html">Спирки</a>
+            <a href="schedules.html" class="active">Разписания</a>
+            <a href="contact.html">Контакти</a>
+        </nav>
+    </header>
+
+    <hr>
+
+    <!-- 2. Основна част -->
+    <main>
+        <!-- Избор на разписание -->
+        <section>
+            <h3>Избор на разписание по линия и спирка</h3>
+            <form action="schedules.php" method="GET" class="planner-form">
+                <div class="planner-inputs">
+                    <div class="input-group">
+                        <label for="select-line">Изберете линия:</label>
+                        <input type="text" id="select-line" name="line" placeholder="напр. Автобус 7">
+                    </div>
+                    <div class="input-group">
+                        <label for="select-stop">Изберете спирка:</label>
+                        <input type="text" id="select-stop" name="stop" placeholder="напр. Централна гара">
+                    </div>
+                </div>
+                <button type="submit" class="btn-plan">Покажи разписание</button>
+            </form>
+        </section>
+
+        <br>
+
+        <!-- Резултат / Разписание -->
+        <section>
+            <h3>Разписание за Автобус № 7 (Спирка: Централна гара)</h3>
+            <div class="route-card">
+                <div class="route-header">
+                    <span class="badge line-bus">Делничен ден</span>
+                    <span class="route-time">Посока: Ж.к. Младост</span>
+                </div>
+                <div class="route-details">
+                    <p><strong>Часове на тръгване:</strong></p>
+                    <p>05: <strong>15, 30, 45</strong></p>
+                    <p>06: <strong>00, 12, 24, 36, 48</strong></p>
+                    <p>07: <strong>00, 10, 20, 30, 40, 50</strong></p>
+                    <p>08: <strong>02, 15, 30, 45</strong></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <hr>
+
+    <!-- 3. Футър -->
+    <footer>
+        <p>&copy; 2026 Градски Транспорт - Екип 1, XII "В" клас</p>
+    </footer>
+
+</body>
+</html>

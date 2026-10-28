@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="tran.svg" type="image/svg+xml">
+    <title>Линии - Градски Транспорт</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+
+    <!-- 1. Главна навигация -->
+    <header>
+        <div class="brand">
+            <img src="tran.svg" alt="Лого на Градски Транспорт" class="logo">
+            <h2>Градски Транспорт</h2>
+        </div>
+
+        <nav>
+            <a href="index.html">Начало</a>
+            <a href="plan.html">Планиране</a>
+            <a href="lines.html" class="active">Линии</a>
+            <a href="stops.html">Спирки</a>
+            <a href="schedules.html">Разписания</a>
+            <a href="contact.html">Контакти</a>
+        </nav>
+    </header>
+
+    <hr>
+
+    <!-- 2. Основна част -->
+    <main>
+        <!-- Търсене на линия -->
+        <section>
+            <h3>Търсене на линия</h3>
+            <form action="search_lines.php" method="GET">
+                <input type="text" name="line_query" placeholder="Въведете номер на линия...">
+                <button type="submit">Търси линия</button>
+            </form>
+        </section>
+
+        <br>
+
+        <!-- Списък с линии -->
+        <section>
+            <h3>Всички транспортни линии</h3>
+            
+            <div class="route-card">
+                <div class="route-header">
+                    <span class="badge line-bus">Автобус № 7</span>
+                    <span class="route-time">Интервал: 12 мин.</span>
+                </div>
+                <div class="route-details">
+                    <p><strong>Маршрут:</strong> Ж.к. Младост - Централна Гара</p>
+                    <p class="route-stops-count">Брой спирки: 18</p>
+                </div>
+                <a href="schedules.html?line=7" class="btn-details">Виж разписание &rarr;</a>
+            </div>
+
+            <div class="route-card">
+                <div class="route-header">
+                    <span class="badge line-trolley">Тролей № 5</span>
+                    <span class="route-time">Интервал: 10 мин.</span>
+                </div>
+                <div class="route-details">
+                    <p><strong>Маршрут:</strong> Ж.к. Левски - СУ Св. Климент Охридски</p>
+                    <p class="route-stops-count">Брой спирки: 14</p>
+                </div>
+                <a href="schedules.html?line=5" class="btn-details">Виж разписание &rarr;</a>
+            </div>
+
+            <div class="route-card">
+                <div class="route-header">
+                    <span class="badge line-bus">Автобус № 204</span>
+                    <span class="route-time">Интервал: 8 мин.</span>
+                </div>
+                <div class="route-details">
+                    <p><strong>Маршрут:</strong> Ж.к. Дружба 2 - Пемо Кюстендил</p>
+                    <p class="route-stops-count">Брой спирки: 22</p>
+                </div>
+                <a href="schedules.html?line=204" class="btn-details">Виж разписание &rarr;</a>
+            </div>
+        </section>
+    </main>
+
+    <hr>
+
+    <!-- 3. Футър -->
+    <footer>
+        <p>&copy; 2026 Градски Транспорт - Екип 1, XII "В" клас</p>
+    </footer>
+
+</body>
+</html>

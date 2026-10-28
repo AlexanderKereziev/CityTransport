@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="tran.svg" type="image/svg+xml">
+    <title>Контакти - Градски Транспорт Гоце Делчев</title>
+    <link rel="stylesheet" href="main.css">
+    <style>
+        section form textarea {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            outline: none;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+        }
+        section form textarea:focus {
+            border-color: #004b87;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. Главна навигация -->
+    <header>
+        <div class="brand">
+            <img src="tran.svg" alt="Лого на Градски Транспорт" class="logo">
+            <h2>Градски Транспорт - Гоце Делчев</h2>
+        </div>
+
+        <nav>
+            <a href="index.html">Начало</a>
+            <a href="plan.html">Планиране</a>
+            <a href="lines.html">Линии</a>
+            <a href="stops.html">Спирки</a>
+            <a href="schedules.html">Разписания</a>
+            <a href="contact.html" class="active">Контакти</a>
+        </nav>
+    </header>
+
+    <hr>
+
+    <!-- 2. Основна част -->
+    <main>
+        <!-- Информация за контакти -->
+        <section>
+            <h3>Информация за връзка</h3>
+            <p>Имате въпроси, предложения или искате да подадете сигнал относно разписанията и обслужването на градския транспорт в гр. Гоце Делчев? Свържете се с нашия екип.</p>
+            <br>
+            <div class="route-details">
+                <p><strong>📍 Адрес на управление:</strong> гр. Гоце Делчев, ул. „Търговска“ № 1 (ПМГ „Яне Сандански“)</p>
+                <p><strong>📞 Телефон за връзка:</strong> +359 888 123 456</p>
+                <p><strong>✉️ Имейл адрес:</strong> transport@gotse-delchev.bg</p>
+                <p><strong>⏰ Работно време:</strong> Понеделник - Петък: 08:30 – 17:30 ч.</p>
+            </div>
+        </section>
+
+        <br>
+
+        <!-- Форма за обратна връзка / запитване -->
+        <section>
+            <h3>Изпратете ни съобщение или сигнал</h3>
+            <form action="send_contact.php" method="POST" class="planner-form">
+                <div class="planner-inputs">
+                    <div class="input-group">
+                        <label for="contact-name">Име и фамилия:</label>
+                        <input type="text" id="contact-name" name="name" placeholder="Въведете вашето име..." required>
+                    </div>
+                    <div class="input-group">
+                        <label for="contact-email">Имейл адрес:</label>
+                        <input type="text" id="contact-email" name="email" placeholder="name@example.com" required>
+                    </div>
+                </div>
+
+                <div class="planner-inputs" style="margin-top: 10px;">
+                    <div class="input-group" style="flex: 1;">
+                        <label for="contact-subject">Тема на съобщението:</label>
+                        <input type="text" id="contact-subject" name="subject" placeholder="напр. Закъснение на автобус № 1" required>
+                    </div>
+                </div>
+
+                <div class="planner-inputs" style="margin-top: 10px;">
+                    <div class="input-group" style="flex: 1;">
+                        <label for="contact-message">Вашето съобщение:</label>
+                        <textarea id="contact-message" name="message" placeholder="Опишете подробно вашето запитване, препоръка или сигнал тук..." required></textarea>
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <button type="submit" class="btn-plan">Изпрати съобщение</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <hr>
+
+    <!-- 3. Футър -->
+    <footer>
+        <p>&copy; 2026 Градски Транспорт - Екип 1, XII "В" клас, ПМГ "Яне Сандански"</p>
+    </footer>
+
+</body>
+</html>
