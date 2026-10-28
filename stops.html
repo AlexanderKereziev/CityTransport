@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="bg">
 <head>
@@ -5,16 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="tran.svg" type="image/svg+xml">
     <title>Спирки Гоце Делчев - Градски Транспорт</title>
-    
+
     <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
     <!-- Основен CSS файл на сайта -->
     <link rel="stylesheet" href="main.css">
 </head>
+
 <body>
 
-    <!-- 1. Главна навигация -->
+    <!-- Главна навигация -->
     <header>
         <div class="brand">
             <img src="tran.svg" alt="Лого на Градски Транспорт" class="logo">
@@ -33,20 +38,27 @@
 
     <hr>
 
-    <!-- 2. Основна част -->
+    <!-- Основна част -->
     <main>
-        <!-- Търсене на спирка и Филтри за достъпност -->
+
+        <!-- Търсене и филтри -->
         <section>
             <h3>Търсене на спирка в гр. Гоце Делчев</h3>
-            <form id="stop-search-form" onsubmit="event.preventDefault(); filterStops();">
-                <input type="text" id="stop-search-input" placeholder="Въведете име или код на спирка (напр. ПМГ, Болница)...">
+
+            <form id="stop-search-form">
+                <input
+                    type="text"
+                    id="stop-search-input"
+                    placeholder="Въведете име или код на спирка (напр. ПМГ, Болница)..."
+                >
                 <button type="submit">Търси спирка</button>
             </form>
 
             <div class="filter-box">
                 <span class="filter-label">Филтри за достъпност:</span>
+
                 <label class="checkbox-container">
-                    <input type="checkbox" id="accessible-only" onchange="filterStops()">
+                    <input type="checkbox" id="accessible-only">
                     <span class="checkmark"></span>
                     ♿ Само достъпни спирки (рампи / нископодови автобуси)
                 </label>
@@ -55,13 +67,15 @@
 
         <br>
 
-        <!-- Интерактивна Карта на Гоце Делчев -->
+        <!-- Интерактивна карта -->
         <section>
             <h3>Интерактивна карта на спирките в Гоце Делчев</h3>
+
             <p class="map-instruction">
-                Кликнете върху спирка от картата или списъка по-долу, за да прегледате линията и очакваното време за пристигане.
+                Кликнете върху спирка от картата или списъка по-долу,
+                за да прегледате информацията за нея.
             </p>
-            
+
             <div id="map"></div>
 
             <div class="map-legend">
@@ -69,6 +83,7 @@
                     <span class="legend-color legend-accessible"></span>
                     <span>♿ Достъпна спирка (рампа / нископодов автобус)</span>
                 </div>
+
                 <div class="legend-item">
                     <span class="legend-color legend-standard"></span>
                     <span>Стандартна спирка</span>
@@ -81,160 +96,190 @@
         <!-- Списък със спирки -->
         <section>
             <h3>Списък на градските спирки</h3>
+
             <div id="stops-list-container" class="stops-grid">
-                <!-- Спирките се генерират динамично от JavaScript -->
+                <p>Зареждане на спирките...</p>
             </div>
         </section>
+
     </main>
 
     <hr>
 
-    <!-- 3. Футър -->
+    <!-- Футър -->
     <footer>
-        <p>&copy; 2026 Градски Транспорт - Екип 1, XII "В" клас, ПМГ "Яне Сандански"</p>
+        <p>
+            &copy; 2026 Градски Транспорт - Екип 1, XII "В" клас,
+            ПМГ "Яне Сандански"
+        </p>
     </footer>
 
-    <!-- Leaflet JS Script -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0q肢За зареждане на картата..."></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <script>
-        // Данни за спирките, позиционирани изцяло в гр. Гоце Делчев
-        const gotseDelchevStops = [
-            {
-                id: "GD01",
-                name: "ПМГ 'Яне Сандански'",
-                lat: 41.5721,
-                lng: 23.7265,
-                accessible: true,
-                lines: [
-                    { number: "1", type: "bus", time: "3 мин", destination: "Автогара Гоце Делчев", lowFloor: true },
-                    { number: "3", type: "bus", time: "7 мин", destination: "Ж.к. Дунав", lowFloor: true }
-                ]
-            },
-            {
-                id: "GD02",
-                name: "Автогара Гоце Делчев",
-                lat: 41.5770,
-                lng: 23.7312,
-                accessible: true,
-                lines: [
-                    { number: "1", type: "bus", time: "2 мин", destination: "МБАЛ 'Иван Скендеров'", lowFloor: true },
-                    { number: "2", type: "bus", time: "10 мин", destination: "Промишлена зона", lowFloor: false }
-                ]
-            },
-            {
-                id: "GD03",
-                name: "МБАЛ 'Иван Скендеров' (Болницата)",
-                lat: 41.5658,
-                lng: 23.7335,
-                accessible: true,
-                lines: [
-                    { number: "1", type: "bus", time: "5 мин", destination: "ПМГ 'Яне Сандански'", lowFloor: true },
-                    { number: "3", type: "bus", time: "12 мин", destination: "Централен площад", lowFloor: true }
-                ]
-            },
-            {
-                id: "GD04",
-                name: "Площад 'Гоце Делчев' (Център)",
-                lat: 41.5710,
-                lng: 23.7288,
-                accessible: false,
-                lines: [
-                    { number: "2", type: "bus", time: "4 мин", destination: "Автогара Гоце Делчев", lowFloor: false },
-                    { number: "3", type: "bus", time: "8 мин", destination: "МБАЛ 'Иван Скендеров'", lowFloor: true }
-                ]
-            },
-            {
-                id: "GD05",
-                name: "Районен съд / Пощата",
-                lat: 41.5742,
-                lng: 23.7271,
-                accessible: true,
-                lines: [
-                    { number: "1", type: "bus", time: "6 мин", destination: "Ж.к. Дунав", lowFloor: true },
-                    { number: "2", type: "bus", time: "15 мин", destination: "Промишлена зона", lowFloor: false }
-                ]
-            },
-            {
-                id: "GD06",
-                name: "Ж.к. Дунав",
-                lat: 41.5682,
-                lng: 23.7215,
-                accessible: false,
-                lines: [
-                    { number: "3", type: "bus", time: "9 мин", destination: "ПМГ 'Яне Сандански'", lowFloor: true }
-                ]
-            }
-        ];
+    <!-- Firebase + карта -->
+    <script type="module">
+        import { getStops } from "./firebase.js";
 
+        let gotseDelchevStops = [];
         let map;
         let markersGroup;
 
-        // Център на Гоце Делчев
         const GOTSE_DELCHEV_CENTER = [41.5715, 23.7280];
 
-        document.addEventListener('DOMContentLoaded', () => {
+        // Стартиране на картата и зареждане на данните
+        document.addEventListener("DOMContentLoaded", async () => {
             initMap();
-            renderStopsList(gotseDelchevStops);
+
+            try {
+                const databaseStops = await getStops();
+
+                gotseDelchevStops = databaseStops
+                    .map(stop => ({
+                        id: String(stop.id),
+                        name: stop.name || "Спирка без име",
+                        lat: Number(stop.lat),
+                        lng: Number(stop.lng),
+                        accessible: stop.accessible === true,
+
+                        // Линиите могат да бъдат добавени в Firestore по-късно
+                        lines: Array.isArray(stop.lines) ? stop.lines : []
+                    }))
+                    .filter(stop =>
+                        Number.isFinite(stop.lat) &&
+                        Number.isFinite(stop.lng) &&
+                        stop.lat >= -90 &&
+                        stop.lat <= 90 &&
+                        stop.lng >= -180 &&
+                        stop.lng <= 180
+                    );
+
+                addMarkersToMap(gotseDelchevStops);
+                renderStopsList(gotseDelchevStops);
+
+                map.invalidateSize();
+
+            } catch (error) {
+                console.error("Грешка при зареждане на спирките:", error);
+
+                document.getElementById("stops-list-container").innerHTML = `
+                    <p style="color: #b00020;">
+                        Неуспешно зареждане на спирките от базата данни.
+                        Проверете интернет връзката и настройките на Firestore.
+                    </p>
+                `;
+            }
         });
 
+        // Инициализиране на Leaflet картата
         function initMap() {
-            // Инициализиране на картата с Фокус ексклузивно върху Гоце Делчев
-            map = L.map('map', {
+            map = L.map("map", {
                 center: GOTSE_DELCHEV_CENTER,
                 zoom: 15,
-                minZoom: 13, // Ограничение, за да не може потребителят да излезе твърде далеч от града
+                minZoom: 13,
                 maxZoom: 18
             });
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap сътрудници'
-            }).addTo(map);
+            L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+                    attribution: "&copy; OpenStreetMap сътрудници"
+                }
+            ).addTo(map);
 
             markersGroup = L.layerGroup().addTo(map);
-            addMarkersToMap(gotseDelchevStops);
         }
 
+        // Персонализирана икона според достъпността
         function createCustomIcon(isAccessible) {
-            const color = isAccessible ? '#28a745' : '#004b87';
+            const color = isAccessible ? "#28a745" : "#004b87";
+
             const iconSvg = `
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="${color}">
-                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                </svg>`;
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 24 24"
+                     width="32"
+                     height="32"
+                     fill="${color}">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5-2.5-2.5 2.5 1.12 2.5 2.5 2.5 2.5-2.5 2.5z"/>
+                </svg>
+            `;
+
             return L.divIcon({
                 html: iconSvg,
-                className: '',
+                className: "",
                 iconSize: [32, 32],
                 iconAnchor: [16, 32],
                 popupAnchor: [0, -32]
             });
         }
 
+        // Добавяне на маркерите от Firestore към картата
         function addMarkersToMap(stops) {
             markersGroup.clearLayers();
 
             stops.forEach(stop => {
-                const marker = L.marker([stop.lat, stop.lng], {
-                    icon: createCustomIcon(stop.accessible)
-                });
+                const marker = L.marker(
+                    [stop.lat, stop.lng],
+                    {
+                        icon: createCustomIcon(stop.accessible)
+                    }
+                );
 
-                let linesHtml = stop.lines.map(l => `
-                    <div style="margin-top: 6px; font-size: 0.85rem; border-top: 1px solid #eeeeee; padding-top: 4px;">
-                        <span class="badge line-bus">Автобус № ${l.number}</span>
-                        <strong>${l.time}</strong> &rarr; ${l.destination}
-                        ${l.lowFloor ? '<span class="badge-access">♿</span>' : ''}
+                const linesHtml = stop.lines.map(line => `
+                    <div style="
+                        margin-top: 6px;
+                        font-size: 0.85rem;
+                        border-top: 1px solid #eeeeee;
+                        padding-top: 4px;
+                    ">
+                        <span class="badge line-bus">
+                            Автобус № ${line.number}
+                        </span>
+
+                        <strong>${line.time}</strong>
+                        &rarr; ${line.destination}
+
+                        ${line.lowFloor
+                            ? '<span class="badge-access">♿</span>'
+                            : ""}
                     </div>
-                `).join('');
+                `).join("");
 
                 const popupContent = `
-                    <div style="font-family: 'Segoe UI', sans-serif; min-width: 180px;">
-                        <h4 style="color:#004b87; margin-bottom: 4px;">${stop.name}</h4>
-                        <p style="font-size:0.8rem; color:#666; margin-bottom:6px;">Код: <strong>${stop.id}</strong> (Гоце Делчев)</p>
-                        ${stop.accessible ? '<p style="color:#28a745; font-size:0.78rem; font-weight:bold; margin-bottom:6px;">♿ Достъпна спирка</p>' : ''}
+                    <div style="
+                        font-family: 'Segoe UI', sans-serif;
+                        min-width: 180px;
+                    ">
+                        <h4 style="color:#004b87; margin-bottom:4px;">
+                            ${stop.name}
+                        </h4>
+
+                        <p style="
+                            font-size:0.8rem;
+                            color:#666;
+                            margin-bottom:6px;
+                        ">
+                            Код: <strong>${stop.id}</strong> (Гоце Делчев)
+                        </p>
+
+                        ${stop.accessible
+                            ? '<p style="color:#28a745;font-size:0.78rem;font-weight:bold;margin-bottom:6px;">♿ Достъпна спирка</p>'
+                            : ""}
+
                         <strong>Пристигащи автобуси:</strong>
-                        ${linesHtml}
+
+                        ${linesHtml ||
+                            "<p>Няма добавена информация за линиите.</p>"}
+
                         <br>
-                        <a href="schedules.html?stop=${stop.id}" class="btn-details" style="font-size:0.8rem;">Виж пълно разписание &rarr;</a>
+
+                        <a
+                            href="schedules.html?stop=${encodeURIComponent(stop.id)}"
+                            class="btn-details"
+                            style="font-size:0.8rem;"
+                        >
+                            Виж пълно разписание &rarr;
+                        </a>
                     </div>
                 `;
 
@@ -243,63 +288,133 @@
             });
         }
 
+        // Генериране на картите със спирки
         function renderStopsList(stops) {
-            const container = document.getElementById('stops-list-container');
-            container.innerHTML = '';
+            const container = document.getElementById("stops-list-container");
+
+            container.innerHTML = "";
 
             if (stops.length === 0) {
-                container.innerHTML = '<p style="grid-column: 1/-1; color: #666;">Няма намерени спирки в гр. Гоце Делчев по зададените критерии.</p>';
+                container.innerHTML = `
+                    <p style="grid-column:1/-1; color:#666;">
+                        Няма намерени спирки в гр. Гоце Делчев
+                        по зададените критерии.
+                    </p>
+                `;
                 return;
             }
 
             stops.forEach(stop => {
-                const card = document.createElement('div');
-                card.className = 'route-card stop-card';
-                card.onclick = () => focusStopOnMap(stop.lat, stop.lng, stop.id);
+                const card = document.createElement("div");
+                card.className = "route-card stop-card";
 
-                let linesBadges = stop.lines.map(l => `
-                    <span class="badge line-bus">№ ${l.number}</span>
-                `).join(' ');
+                card.onclick = () => {
+                    focusStopOnMap(stop.lat, stop.lng);
+                };
+
+                const linesBadges = stop.lines.map(line => `
+                    <span class="badge line-bus">
+                        № ${line.number}
+                    </span>
+                `).join(" ");
 
                 card.innerHTML = `
                     <div class="route-header">
-                        <strong style="font-size:1.05rem; color:#004b87;">${stop.name}</strong>
-                        <span class="route-stops-count">Код: ${stop.id}</span>
+                        <strong style="font-size:1.05rem; color:#004b87;">
+                            ${stop.name}
+                        </strong>
+
+                        <span class="route-stops-count">
+                            Код: ${stop.id}
+                        </span>
                     </div>
+
                     <div class="route-details">
-                        <p style="margin-bottom: 8px;"><strong>Минаващи линии:</strong> ${linesBadges}</p>
-                        ${stop.accessible ? '<span class="badge-access">♿ Достъпна спирка</span>' : '<span style="font-size:0.8rem; color:#888;">Стандартна спирка</span>'}
+                        <p style="margin-bottom:8px;">
+                            <strong>Минаващи линии:</strong>
+                            ${linesBadges || "Няма добавена информация"}
+                        </p>
+
+                        ${stop.accessible
+                            ? '<span class="badge-access">♿ Достъпна спирка</span>'
+                            : '<span style="font-size:0.8rem;color:#888;">Стандартна спирка</span>'}
                     </div>
-                    <a href="schedules.html?stop=${stop.id}" class="btn-details" onclick="event.stopPropagation();">Разписание &rarr;</a>
+
+                    <a
+                        href="schedules.html?stop=${encodeURIComponent(stop.id)}"
+                        class="btn-details"
+                    >
+                        Разписание &rarr;
+                    </a>
                 `;
+
+                // Кликът върху разписанието не трябва да отваря картата
+                card.querySelector("a").addEventListener("click", event => {
+                    event.stopPropagation();
+                });
 
                 container.appendChild(card);
             });
         }
 
+        // Фокус върху избрана спирка
         function focusStopOnMap(lat, lng) {
             map.setView([lat, lng], 17);
-            markersGroup.eachLayer(layer => {
-                if (layer.getLatLng().lat === lat && layer.getLatLng().lng === lng) {
-                    layer.openPopup();
+
+            markersGroup.eachLayer(marker => {
+                const position = marker.getLatLng();
+
+                if (position.lat === lat && position.lng === lng) {
+                    marker.openPopup();
                 }
             });
-            document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
+
+            document.getElementById("map").scrollIntoView({
+                behavior: "smooth"
+            });
         }
 
+        // Търсене и филтриране на спирките
         function filterStops() {
-            const searchQuery = document.getElementById('stop-search-input').value.toLowerCase().trim();
-            const accessibleOnly = document.getElementById('accessible-only').checked;
+            const searchQuery = document
+                .getElementById("stop-search-input")
+                .value
+                .toLowerCase()
+                .trim();
+
+            const accessibleOnly = document
+                .getElementById("accessible-only")
+                .checked;
 
             const filtered = gotseDelchevStops.filter(stop => {
-                const matchesSearch = stop.name.toLowerCase().includes(searchQuery) || stop.id.toLowerCase().includes(searchQuery);
-                const matchesAccess = !accessibleOnly || stop.accessible;
+                const matchesSearch =
+                    stop.name.toLowerCase().includes(searchQuery) ||
+                    stop.id.toLowerCase().includes(searchQuery);
+
+                const matchesAccess =
+                    !accessibleOnly || stop.accessible;
+
                 return matchesSearch && matchesAccess;
             });
 
             addMarkersToMap(filtered);
             renderStopsList(filtered);
         }
+
+        // Свързване на търсенето и филтъра с HTML елементите
+        document.getElementById("stop-search-form").addEventListener(
+            "submit",
+            event => {
+                event.preventDefault();
+                filterStops();
+            }
+        );
+
+        document.getElementById("accessible-only").addEventListener(
+            "change",
+            filterStops
+        );
     </script>
+
 </body>
 </html>

@@ -69,5 +69,21 @@
         <p>&copy; 2026 Градски Транспорт - Екип 1, XII "В" клас</p>
     </footer>
 
+    <script type="module">
+        import { getStops } from "./firebase.js";
+
+        async function testFirebase() {
+            try {
+            const stops = await getStops();
+            console.log("Successfully connected to Firestore!");
+            console.table(stops);
+            } catch (error) {
+            console.error("Firestore connection failed:", error);
+            }
+        }
+
+        testFirebase();
+    </script>
+
 </body>
 </html>
