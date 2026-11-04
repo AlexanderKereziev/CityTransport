@@ -4,7 +4,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebas
 import {
     getFirestore,
     collection,
-    getDocs
+    getDocs,
+    addDoc,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
 // Firebase configuration
@@ -14,7 +16,7 @@ const firebaseConfig = {
     projectId: "citytransport-4d257",
     storageBucket: "citytransport-4d257.firebasestorage.app",
     messagingSenderId: "147320456860",
-    appId: "1:147320456860:web:3a3992c4fa43ca66510f59",
+    appId: "1:320456860:web:3a3992c4fa43ca66510f59",
     measurementId: "G-4B823NY2S4"
 };
 
@@ -24,7 +26,10 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firestore
 export const db = getFirestore(app);
 
-// Retrieve all stops
+
+// ==========================================
+// RETRIEVE ALL STOPS
+// ==========================================
 export async function getStops() {
     const snapshot = await getDocs(collection(db, "stops"));
 
@@ -34,7 +39,10 @@ export async function getStops() {
     }));
 }
 
-// Retrieve all transport lines
+
+// ==========================================
+// RETRIEVE ALL TRANSPORT LINES
+// ==========================================
 export async function getLines() {
     const snapshot = await getDocs(collection(db, "lines"));
 
@@ -44,7 +52,10 @@ export async function getLines() {
     }));
 }
 
-// Retrieve all schedules
+
+// ==========================================
+// RETRIEVE ALL SCHEDULES
+// ==========================================
 export async function getSchedules() {
     const snapshot = await getDocs(collection(db, "schedules"));
 
@@ -54,7 +65,10 @@ export async function getSchedules() {
     }));
 }
 
-// Retrieve all contacts
+
+// ==========================================
+// RETRIEVE ALL CONTACTS
+// ==========================================
 export async function getContacts() {
     const snapshot = await getDocs(collection(db, "contacts"));
 
@@ -62,4 +76,18 @@ export async function getContacts() {
         id: document.id,
         ...document.data()
     }));
+}
+
+
+// ==========================================
+// SUBMIT CONTACT MESSAGE
+// ==========================================
+export async function sendContactMessage(data) {
+    return await addDoc(collection(db, "contacts"), {
+        fullName: data.fullName,
+        email: data.email,
+        subject: data.subject,
+        message: data.message,
+        createdAt: serverTimestamp()
+    });
 }
