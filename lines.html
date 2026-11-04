@@ -62,8 +62,7 @@
     <!-- Локален скрипт за логиката на тази страница -->
     <script type="module">
         // Импортираме инстанцията на db от вашия готов файл (променете 'firebase-config.js' с името на вашия файл)
-        import { db } from "./firebase-config.js"; 
-        import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getLines } from "./firebase.js";
 
         const linesContainer = document.getElementById("linesContainer");
         const searchForm = document.getElementById("searchForm");
@@ -91,18 +90,21 @@
         // Зареждане на всички линии
         async function loadLines() {
             linesContainer.innerHTML = "<p>Зареждане на линиите...</p>";
+
             try {
-                const querySnapshot = await getDocs(collection(db, "lines"));
+                const lines = await getLines();
+
                 linesContainer.innerHTML = "";
-                
-                if (querySnapshot.empty) {
+
+                if (lines.length === 0) {
                     linesContainer.innerHTML = "<p>Няма намерени линии.</p>";
                     return;
                 }
 
-                querySnapshot.forEach((doc) => {
-                    linesContainer.innerHTML += renderCard(doc.data());
+                lines.forEach(line => {
+                    linesContainer.innerHTML += renderCard(line);
                 });
+
             } catch (error) {
                 console.error("Грешка при зареждане:", error);
                 linesContainer.innerHTML = "<p>Грешка при зареждане на данните.</p>";
@@ -112,6 +114,7 @@
         // Търсене на линия
         async function searchLine(event) {
             event.preventDefault();
+
             const queryVal = lineInput.value.trim();
 
             if (!queryVal) {
@@ -119,26 +122,24 @@
                 return;
             }
 
-            linesContainer.innerHTML = "<p>Търсене...</p>";
             try {
-                // 1. Първо търсим като текст (String)
-                let q = query(collection(db, "lines"), where("lineNumber", "==", queryVal));
-                let querySnapshot = await getDocs(q);
+                const lines = await getLines();
 
-                // 2. Ако няма резултат и въведеното е число, търсим и като число (Number)
-                if (querySnapshot.empty && !isNaN(queryVal)) {
-                    q = query(collection(db, "lines"), where("lineNumber", "==", Number(queryVal)));
-                    querySnapshot = await getDocs(q);
-                }
+                const results = lines.filter(line =>
+                    String(line.lineNumber) === queryVal
+                );
 
                 linesContainer.innerHTML = "";
-                if (querySnapshot.empty) {
+
+                if (results.length === 0) {
                     linesContainer.innerHTML = "<p>Няма намерена линия с този номер.</p>";
-                } else {
-                    querySnapshot.forEach((doc) => {
-                        linesContainer.innerHTML += renderCard(doc.data());
-                    });
+                    return;
                 }
+
+                results.forEach(line => {
+                    linesContainer.innerHTML += renderCard(line);
+                });
+
             } catch (error) {
                 console.error("Грешка при търсене:", error);
                 linesContainer.innerHTML = "<p>Грешка при изпълнение на търсенето.</p>";

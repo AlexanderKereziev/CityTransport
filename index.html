@@ -74,11 +74,14 @@
 
         async function testFirebase() {
             try {
-            const stops = await getStops();
-            console.log("Successfully connected to Firestore!");
-            console.table(stops);
+                const stops = await getStops();
+
+                console.log("Successfully connected to Firestore!");
+                console.log(`Loaded ${stops.length} stops.`);
+                console.table(stops);
+
             } catch (error) {
-            console.error("Firestore connection failed:", error);
+                console.error("Firestore connection failed:", error);
             }
         }
 
