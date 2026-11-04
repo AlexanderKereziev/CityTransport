@@ -33,8 +33,8 @@
         <!-- Търсене на линия -->
         <section>
             <h3>Търсене на линия</h3>
-            <form action="search_lines.php" method="GET">
-                <input type="text" name="line_query" placeholder="Въведете номер на линия...">
+            <form id="searchForm">
+                <input type="text" id="lineQuery" name="line_query" placeholder="Въведете номер на линия...">
                 <button type="submit">Търси линия</button>
             </form>
         </section>
@@ -45,40 +45,9 @@
         <section>
             <h3>Всички транспортни линии</h3>
             
-            <div class="route-card">
-                <div class="route-header">
-                    <span class="badge line-bus">Автобус № 7</span>
-                    <span class="route-time">Интервал: 12 мин.</span>
-                </div>
-                <div class="route-details">
-                    <p><strong>Маршрут:</strong> Ж.к. Младост - Централна Гара</p>
-                    <p class="route-stops-count">Брой спирки: 18</p>
-                </div>
-                <a href="schedules.html?line=7" class="btn-details">Виж разписание &rarr;</a>
-            </div>
-
-            <div class="route-card">
-                <div class="route-header">
-                    <span class="badge line-trolley">Тролей № 5</span>
-                    <span class="route-time">Интервал: 10 мин.</span>
-                </div>
-                <div class="route-details">
-                    <p><strong>Маршрут:</strong> Ж.к. Левски - СУ Св. Климент Охридски</p>
-                    <p class="route-stops-count">Брой спирки: 14</p>
-                </div>
-                <a href="schedules.html?line=5" class="btn-details">Виж разписание &rarr;</a>
-            </div>
-
-            <div class="route-card">
-                <div class="route-header">
-                    <span class="badge line-bus">Автобус № 204</span>
-                    <span class="route-time">Интервал: 8 мин.</span>
-                </div>
-                <div class="route-details">
-                    <p><strong>Маршрут:</strong> Ж.к. Дружба 2 - Пемо Кюстендил</p>
-                    <p class="route-stops-count">Брой спирки: 22</p>
-                </div>
-                <a href="schedules.html?line=204" class="btn-details">Виж разписание &rarr;</a>
+            <!-- Динамичен контейнер за картите -->
+            <div id="linesContainer">
+                <!-- Данните от Firebase се зареждат тук -->
             </div>
         </section>
     </main>
@@ -90,5 +59,94 @@
         <p>&copy; 2026 Градски Транспорт - Екип 1, XII "В" клас</p>
     </footer>
 
+    <!-- Локален скрипт за логиката на тази страница -->
+    <script type="module">
+        // Импортираме инстанцията на db от вашия готов файл (променете 'firebase-config.js' с името на вашия файл)
+        import { db } from "./firebase-config.js"; 
+        import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const linesContainer = document.getElementById("linesContainer");
+        const searchForm = document.getElementById("searchForm");
+        const lineInput = document.getElementById("lineQuery");
+
+        // Рендериране на картата с вашата HTML структура
+        function renderCard(data) {
+            const badgeClass = data.type === "Тролей" ? "line-trolley" : "line-bus";
+            
+            return `
+                <div class="route-card">
+                    <div class="route-header">
+                        <span class="badge ${badgeClass}">${data.type} № ${data.lineNumber}</span>
+                        <span class="route-time">Интервал: ${data.intervalMinutes} мин.</span>
+                    </div>
+                    <div class="route-details">
+                        <p><strong>Маршрут:</strong> ${data.route}</p>
+                        <p class="route-stops-count">Брой спирки: ${data.stopsCount}</p>
+                    </div>
+                    <a href="schedules.html?line=${data.lineNumber}" class="btn-details">Виж разписание &rarr;</a>
+                </div>
+            `;
+        }
+
+        // Зареждане на всички линии
+        async function loadLines() {
+            linesContainer.innerHTML = "<p>Зареждане на линиите...</p>";
+            try {
+                const querySnapshot = await getDocs(collection(db, "lines"));
+                linesContainer.innerHTML = "";
+                
+                if (querySnapshot.empty) {
+                    linesContainer.innerHTML = "<p>Няма намерени линии.</p>";
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    linesContainer.innerHTML += renderCard(doc.data());
+                });
+            } catch (error) {
+                console.error("Грешка при зареждане:", error);
+                linesContainer.innerHTML = "<p>Грешка при зареждане на данните.</p>";
+            }
+        }
+
+        // Търсене на линия
+        async function searchLine(event) {
+            event.preventDefault();
+            const queryVal = lineInput.value.trim();
+
+            if (!queryVal) {
+                loadLines();
+                return;
+            }
+
+            linesContainer.innerHTML = "<p>Търсене...</p>";
+            try {
+                // 1. Първо търсим като текст (String)
+                let q = query(collection(db, "lines"), where("lineNumber", "==", queryVal));
+                let querySnapshot = await getDocs(q);
+
+                // 2. Ако няма резултат и въведеното е число, търсим и като число (Number)
+                if (querySnapshot.empty && !isNaN(queryVal)) {
+                    q = query(collection(db, "lines"), where("lineNumber", "==", Number(queryVal)));
+                    querySnapshot = await getDocs(q);
+                }
+
+                linesContainer.innerHTML = "";
+                if (querySnapshot.empty) {
+                    linesContainer.innerHTML = "<p>Няма намерена линия с този номер.</p>";
+                } else {
+                    querySnapshot.forEach((doc) => {
+                        linesContainer.innerHTML += renderCard(doc.data());
+                    });
+                }
+            } catch (error) {
+                console.error("Грешка при търсене:", error);
+                linesContainer.innerHTML = "<p>Грешка при изпълнение на търсенето.</p>";
+            }
+        }
+
+        searchForm.addEventListener("submit", searchLine);
+        document.addEventListener("DOMContentLoaded", loadLines);
+    </script>
 </body>
 </html>
