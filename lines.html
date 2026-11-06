@@ -1,153 +1,304 @@
+
 <!DOCTYPE html>
 <html lang="bg">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="tran.svg" type="image/svg+xml">
-    <title>Линии - Градски Транспорт</title>
+    <title data-i18n="linesPageTitle">Линии - Градски Транспорт</title>
     <link rel="stylesheet" href="main.css">
+    <script src="translations.js" defer></script>
 </head>
 <body>
+<header>
+    <div class="brand">
+        <img
+            src="tran.svg"
+            alt="Лого на Градски Транспорт"
+            class="logo"
+            data-i18n-alt="brand"
+        >
+        <h2 data-i18n="brand">Градски Транспорт</h2>
+    </div>
 
-    <!-- 1. Главна навигация -->
-    <header>
-        <div class="brand">
-            <img src="tran.svg" alt="Лого на Градски Транспорт" class="logo">
-            <h2>Градски Транспорт</h2>
+    <nav>
+        <a href="index.html" data-i18n="home">Начало</a>
+        <a href="plan.html" data-i18n="planning">Планиране</a>
+        <a href="lines.html" class="active" data-i18n="lines">Линии</a>
+        <a href="tran.html" data-i18n="transfers">Трансфери</a>
+        <a href="stops.html" data-i18n="stops">Спирки</a>
+        <a href="schedules.html" data-i18n="schedules">Разписания</a>
+        <a href="contact.html" data-i18n="contacts">Контакти</a>
+
+        <button id="language-toggle" type="button">🇬🇧 English</button>
+    </nav>
+</header>
+
+<hr>
+
+<main>
+    <section>
+        <h3 data-i18n="searchLineTitle">Търсене на линия</h3>
+
+        <form id="searchForm">
+            <input
+                type="text"
+                id="lineQuery"
+                name="line_query"
+                placeholder="Въведете номер или вид транспорт..."
+                data-i18n-placeholder="lineSearchPlaceholder"
+            >
+
+            <button type="submit" data-i18n="searchLineButton">
+                Търси линия
+            </button>
+
+            <button type="button" id="resetButton" data-i18n="showAllButton">
+                Покажи всички
+            </button>
+        </form>
+    </section>
+
+    <br>
+
+    <section>
+        <h3 data-i18n="allLinesTitle">Всички транспортни линии</h3>
+
+        <div id="linesContainer">
+            <p data-i18n="loadingLines">Зареждане на линиите...</p>
         </div>
+    </section>
+</main>
 
-        <nav>
-            <a href="index.html">Начало</a>
-            <a href="plan.html">Планиране</a>
-            <a href="lines.html" class="active">Линии</a>
-            <a href="stops.html">Спирки</a>
-            <a href="schedules.html">Разписания</a>
-            <a href="contact.html">Контакти</a>
-        </nav>
-    </header>
+<hr>
 
-    <hr>
+<footer>
+    <p data-i18n="linesFooter">
+        © 2026 Градски Транспорт - Екип 1, XII "В" клас
+    </p>
+</footer>
 
-    <!-- 2. Основна част -->
-    <main>
-        <!-- Търсене на линия -->
-        <section>
-            <h3>Търсене на линия</h3>
-            <form id="searchForm">
-                <input type="text" id="lineQuery" name="line_query" placeholder="Въведете номер на линия...">
-                <button type="submit">Търси линия</button>
-            </form>
-        </section>
+<script type="module">
+    import { getLines, getStops } from "./firebase.js";
 
-        <br>
+    const linesContainer = document.getElementById("linesContainer");
+    const searchForm = document.getElementById("searchForm");
+    const lineInput = document.getElementById("lineQuery");
+    const resetButton = document.getElementById("resetButton");
 
-        <!-- Списък с линии -->
-        <section>
-            <h3>Всички транспортни линии</h3>
-            
-            <!-- Динамичен контейнер за картите -->
-            <div id="linesContainer">
-                <!-- Данните от Firebase се зареждат тук -->
-            </div>
-        </section>
-    </main>
+    let allLines = [];
+    let allStops = [];
 
-    <hr>
+    const escapeHTML = value => String(value ?? "").replace(
+        /[&<>"']/g,
+        character => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+        })[character]
+    );
 
-    <!-- 3. Футър -->
-    <footer>
-        <p>&copy; 2026 Градски Транспорт - Екип 1, XII "В" клас</p>
-    </footer>
+    function getStopId(entry) {
+        if (typeof entry === "string" || typeof entry === "number") {
+            return String(entry);
+        }
 
-    <!-- Локален скрипт за логиката на тази страница -->
-    <script type="module">
-        // Импортираме инстанцията на db от вашия готов файл (променете 'firebase-config.js' с името на вашия файл)
-        import { getLines } from "./firebase.js";
+        if (entry && typeof entry === "object") {
+            return String(
+                entry.stopId ??
+                entry.stop_id ??
+                entry.id ??
+                entry.docId ??
+                entry.code ??
+                ""
+            );
+        }
 
-        const linesContainer = document.getElementById("linesContainer");
-        const searchForm = document.getElementById("searchForm");
-        const lineInput = document.getElementById("lineQuery");
+        return "";
+    }
 
-        // Рендериране на картата с вашата HTML структура
-        function renderCard(data) {
-            const badgeClass = data.type === "Тролей" ? "line-trolley" : "line-bus";
-            
-            return `
-                <div class="route-card">
-                    <div class="route-header">
-                        <span class="badge ${badgeClass}">${data.type} № ${data.lineNumber}</span>
-                        <span class="route-time">Интервал: ${data.intervalMinutes} мин.</span>
-                    </div>
-                    <div class="route-details">
-                        <p><strong>Маршрут:</strong> ${data.route}</p>
-                        <p class="route-stops-count">Брой спирки: ${data.stopsCount}</p>
-                    </div>
-                    <a href="schedules.html?line=${data.lineNumber}" class="btn-details">Виж разписание &rarr;</a>
+    function getRouteNames(line) {
+        if (!Array.isArray(line.route)) {
+            return [];
+        }
+
+        return line.route.map(entry => {
+            const stopId = getStopId(entry);
+
+            const stop = allStops.find(item =>
+                String(item.id) === stopId
+            );
+
+            return stop
+                ? stop.name
+                : `${getTranslation("unknownStop")} (${stopId})`;
+        });
+    }
+
+    function getTransportType(type) {
+        const normalized = String(type ?? "").toLocaleLowerCase("bg");
+
+        if (normalized.includes("тролей")) {
+            return getTranslation("trolleybus");
+        }
+
+        if (normalized.includes("автобус") || normalized.includes("bus")) {
+            return getTranslation("bus");
+        }
+
+        return type || getTranslation("transport");
+    }
+
+    function getTransportClass(type) {
+        const normalized = String(type ?? "").toLocaleLowerCase("bg");
+
+        if (normalized.includes("тролей")) {
+            return "line-trolley";
+        }
+
+        return "line-bus";
+    }
+
+    function renderCard(line) {
+        const lineNumber = escapeHTML(line.lineNumber ?? "");
+        const type = escapeHTML(getTransportType(line.type));
+        const routeNames = getRouteNames(line);
+
+        const stopsCount = line.stopsCount ?? (
+            Array.isArray(line.route) ? line.route.length : 0
+        );
+
+        const routeHTML = routeNames.length
+            ? routeNames.map(escapeHTML).join(" → ")
+            : escapeHTML(getTranslation("noRouteData"));
+
+        const badgeClass = getTransportClass(line.type);
+
+        return `
+            <div class="route-card">
+                <div class="route-header">
+                    <span class="badge ${badgeClass}">
+                        ${type} № ${lineNumber}
+                    </span>
                 </div>
-            `;
+
+                <div class="route-details">
+                    <p>
+                        <strong>${escapeHTML(getTranslation("routeLabel"))}</strong>
+                        ${routeHTML}
+                    </p>
+
+                    <p class="route-stops-count">
+                        ${escapeHTML(getTranslation("stopsCount"))}
+                        ${escapeHTML(stopsCount)}
+                    </p>
+                </div>
+
+                <a
+                    href="schedules.html?line=${encodeURIComponent(line.lineNumber ?? "")}"
+                    class="btn-details"
+                >
+                    ${escapeHTML(getTranslation("viewSchedule"))} &rarr;
+                </a>
+            </div>
+        `;
+    }
+
+    function displayLines(lines) {
+        if (!lines.length) {
+            linesContainer.innerHTML =
+                `<p>${escapeHTML(getTranslation("noLinesFound"))}</p>`;
+            return;
         }
 
-        // Зареждане на всички линии
-        async function loadLines() {
-            linesContainer.innerHTML = "<p>Зареждане на линиите...</p>";
+        linesContainer.innerHTML = lines
+            .map(renderCard)
+            .join("");
+    }
 
-            try {
-                const lines = await getLines();
+    async function loadLines() {
+        linesContainer.innerHTML =
+            `<p>${escapeHTML(getTranslation("loadingLines"))}</p>`;
 
-                linesContainer.innerHTML = "";
+        try {
+            const [lines, stops] = await Promise.all([
+                getLines(),
+                getStops()
+            ]);
 
-                if (lines.length === 0) {
-                    linesContainer.innerHTML = "<p>Няма намерени линии.</p>";
-                    return;
-                }
+            allLines = Array.isArray(lines) ? lines : [];
+            allStops = Array.isArray(stops) ? stops : [];
 
-                lines.forEach(line => {
-                    linesContainer.innerHTML += renderCard(line);
-                });
+            allLines.sort((a, b) =>
+                String(a.lineNumber ?? "").localeCompare(
+                    String(b.lineNumber ?? ""),
+                    "bg",
+                    { numeric: true }
+                )
+            );
 
-            } catch (error) {
-                console.error("Грешка при зареждане:", error);
-                linesContainer.innerHTML = "<p>Грешка при зареждане на данните.</p>";
-            }
+            displayLines(allLines);
+
+            console.log("Заредени линии:", allLines);
+            console.log("Заредени спирки:", allStops);
+
+        } catch (error) {
+            console.error("Грешка при зареждане:", error);
+
+            linesContainer.innerHTML =
+                `<p>${escapeHTML(getTranslation("linesLoadError"))}</p>`;
+        }
+    }
+
+    function searchLine(event) {
+        event.preventDefault();
+
+        const query = lineInput.value
+            .trim()
+            .toLocaleLowerCase("bg");
+
+        if (!query) {
+            displayLines(allLines);
+            return;
         }
 
-        // Търсене на линия
-        async function searchLine(event) {
-            event.preventDefault();
+        const results = allLines.filter(line => {
+            const number = String(line.lineNumber ?? "")
+                .toLocaleLowerCase("bg");
 
-            const queryVal = lineInput.value.trim();
+            const type = String(line.type ?? "")
+                .toLocaleLowerCase("bg");
 
-            if (!queryVal) {
-                loadLines();
-                return;
-            }
+            return number.includes(query) || type.includes(query);
+        });
 
-            try {
-                const lines = await getLines();
+        displayLines(results);
+    }
 
-                const results = lines.filter(line =>
-                    String(line.lineNumber) === queryVal
-                );
+    function resetSearch() {
+        lineInput.value = "";
+        displayLines(allLines);
+    }
 
-                linesContainer.innerHTML = "";
+    searchForm.addEventListener("submit", searchLine);
+    resetButton.addEventListener("click", resetSearch);
 
-                if (results.length === 0) {
-                    linesContainer.innerHTML = "<p>Няма намерена линия с този номер.</p>";
-                    return;
-                }
+    // Re-render Firebase-generated cards when the language changes.
+    document.addEventListener("languageChanged", () => {
+        const query = lineInput.value.trim();
 
-                results.forEach(line => {
-                    linesContainer.innerHTML += renderCard(line);
-                });
-
-            } catch (error) {
-                console.error("Грешка при търсене:", error);
-                linesContainer.innerHTML = "<p>Грешка при изпълнение на търсенето.</p>";
-            }
+        if (!query) {
+            displayLines(allLines);
+            return;
         }
 
-        searchForm.addEventListener("submit", searchLine);
-        document.addEventListener("DOMContentLoaded", loadLines);
-    </script>
+        searchLine(new Event("submit", { cancelable: true }));
+    });
+
+    loadLines();
+</script>
+
 </body>
 </html>

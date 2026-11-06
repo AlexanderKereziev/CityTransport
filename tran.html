@@ -1,0 +1,759 @@
+
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" href="tran.svg" type="image/svg+xml">
+    <title>Трансферни връзки - Градски Транспорт Гоце Делчев</title>
+
+    <link rel="stylesheet" href="main.css">
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+    <style>
+        .transfer-intro {
+            margin-bottom: 20px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        #transfer-map {
+            width: 100%;
+            height: 420px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            z-index: 1;
+        }
+
+        .transfer-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .summary-box {
+            background: #f4f7f6;
+            border-left: 4px solid #004b87;
+            border-radius: 6px;
+            padding: 15px;
+        }
+
+        .summary-box.walking {
+            border-left-color: #28a745;
+        }
+
+        .summary-box strong {
+            display: block;
+            font-size: 26px;
+            color: #004b87;
+        }
+
+        .summary-box span {
+            color: #555;
+            font-size: 14px;
+        }
+
+        .transfer-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-button {
+            border: 1px solid #004b87;
+            background: white;
+            color: #004b87;
+            padding: 9px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .filter-button:hover,
+        .filter-button.active {
+            background: #004b87;
+            color: white;
+        }
+
+        .transfer-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 15px;
+        }
+
+        .transfer-card h4 {
+            color: #004b87;
+            margin: 0 0 10px;
+        }
+
+        .transfer-card p {
+            margin: 7px 0;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .transfer-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-top: 12px;
+        }
+
+        .transfer-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            background: #e8f1f8;
+            color: #004b87;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .transfer-badge.walking {
+            background: #e5f5e9;
+            color: #218838;
+        }
+
+        .transfer-distance {
+            font-weight: 600;
+            color: #218838 !important;
+        }
+
+        .transfer-note {
+            background: #fff8e6;
+            border-left: 4px solid #e0a800;
+            padding: 12px 15px;
+            border-radius: 5px;
+            color: #665313;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-top: 15px;
+        }
+
+        .transfer-empty {
+            text-align: center;
+            padding: 25px;
+            color: #666;
+            background: #f4f7f6;
+            border-radius: 8px;
+        }
+
+        .transfer-status {
+            margin-bottom: 15px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .transfer-summary {
+                grid-template-columns: 1fr;
+            }
+
+            #transfer-map {
+                height: 320px;
+            }
+
+            .filter-button {
+                flex: 1;
+            }
+        }
+    </style>
+
+    <script src="translations.js" defer></script>
+</head>
+
+<body>
+
+<header>
+    <div class="brand">
+        <img src="tran.svg" alt="Лого">
+        <h2 data-i18n="brand">Градски Транспорт Гоце Делчев</h2>
+    </div>
+
+    <nav>
+        <a href="index.html" data-i18n="home">Начало</a>
+        <a href="plan.html" data-i18n="planning">Планиране</a>
+        <a href="lines.html" data-i18n="lines">Линии</a>
+        <a href="tran.html" class="active" data-i18n="transfers">Трансфери</a>
+        <a href="stops.html" data-i18n="stops">Спирки</a>
+        <a href="schedules.html" data-i18n="schedules">Разписания</a>
+        <a href="contact.html" data-i18n="contacts">Контакти</a>
+    </nav>
+
+    <button id="language-toggle" type="button" onclick="toggleLanguage()">
+        🇬🇧 English
+    </button>
+</header>
+
+<main>
+
+    <section>
+        <h2 data-i18n="transferHeading">Трансферни връзки</h2>
+
+        <p class="transfer-intro" data-i18n="transferIntro">
+            Тук можете да разгледате местата, на които пътниците могат
+            да се прекачат между различни автобусни линии, както и
+            близки спирки, между които може да се извърши пешеходен трансфер.
+        </p>
+
+        <div class="transfer-summary">
+            <div class="summary-box">
+                <strong id="shared-count">0</strong>
+                <span data-i18n="sharedStopsCount">Общи спирки между линии</span>
+            </div>
+
+            <div class="summary-box walking">
+                <strong id="walking-count">0</strong>
+                <span data-i18n="walkingTransfersCount">Пешеходни трансфери</span>
+            </div>
+        </div>
+
+        <div id="transfer-map"></div>
+
+        <div class="transfer-note">
+            <strong data-i18n="transferNoteTitle">Забележка:</strong>
+            <span data-i18n="transferNote">
+                Разстоянията между близките спирки са изчислени по координатите
+                им по права линия. Посоченото време за ходене е приблизително
+                и действителният пешеходен маршрут може да бъде по-дълъг.
+            </span>
+        </div>
+    </section>
+
+    <section>
+        <h3 data-i18n="availableTransfers">Налични трансфери</h3>
+
+        <div class="transfer-filters">
+            <button class="filter-button active" data-filter="all" data-i18n="filterAll">
+                Всички
+            </button>
+
+            <button class="filter-button" data-filter="shared" data-i18n="filterShared">
+                Общи спирки
+            </button>
+
+            <button class="filter-button" data-filter="walking" data-i18n="filterWalking">
+                Пешеходни трансфери
+            </button>
+        </div>
+
+        <p id="transfer-status" class="transfer-status" data-i18n="loadingTransferInfo">
+            Зареждане на информацията...
+        </p>
+
+        <div id="transfer-list"></div>
+    </section>
+
+</main>
+
+<footer>
+    <p data-i18n="transferFooter">
+        © 2026 Градски Транспорт - Екип 1, XII "В" клас
+    </p>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script type="module">
+    import { getStops, getLines } from "./firebase.js";
+
+    const t = key => getTranslation(key);
+
+    const map = L.map("transfer-map").setView(
+        [41.5715, 23.7280],
+        15
+    );
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+
+    const markerLayer = L.layerGroup().addTo(map);
+    const connectionLayer = L.layerGroup().addTo(map);
+
+    const transferList = document.getElementById("transfer-list");
+    const transferStatus = document.getElementById("transfer-status");
+
+    const sharedCount = document.getElementById("shared-count");
+    const walkingCount = document.getElementById("walking-count");
+
+    let allTransfers = [];
+    let sharedTransfers = [];
+    let walkingTransfers = [];
+    let activeFilter = "all";
+    let dataLoaded = false;
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, character => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+        })[character]);
+    }
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const earthRadius = 6371000;
+        const toRadians = degrees => degrees * Math.PI / 180;
+
+        const dLat = toRadians(lat2 - lat1);
+        const dLon = toRadians(lon2 - lon1);
+
+        const a =
+            Math.sin(dLat / 2) ** 2 +
+            Math.cos(toRadians(lat1)) *
+            Math.cos(toRadians(lat2)) *
+            Math.sin(dLon / 2) ** 2;
+
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return earthRadius * c;
+    }
+
+    function getLineName(line) {
+        return t("transferLine").replace(
+            "{number}",
+            line.lineNumber ?? "?"
+        );
+    }
+
+    function getLineBadgeClass(line) {
+        return String(line.type ?? "").toLowerCase().includes("трол")
+            ? "badge line-trolley"
+            : "badge line-bus";
+    }
+
+    function getLineBadges(lines) {
+        return lines.map(line => `
+            <span class="${getLineBadgeClass(line)}">
+                ${escapeHTML(getLineName(line))}
+            </span>
+        `).join("");
+    }
+
+    function createSharedTransfers(stops, lines) {
+        const transfers = [];
+        const stopById = new Map(
+            stops.map(stop => [String(stop.id), stop])
+        );
+
+        const linesAtStops = new Map();
+
+        lines.forEach((line, index) => {
+            const lineKey = String(
+                line.id ?? line.lineNumber ?? index
+            );
+
+            const route = Array.isArray(line.route) ? line.route : [];
+
+            route.forEach(stopId => {
+                const id = String(stopId);
+
+                if (!stopById.has(id)) return;
+
+                if (!linesAtStops.has(id)) {
+                    linesAtStops.set(id, new Map());
+                }
+
+                linesAtStops.get(id).set(lineKey, line);
+            });
+        });
+
+        linesAtStops.forEach((lineMap, stopId) => {
+            const matchingLines = Array.from(lineMap.values());
+
+            if (matchingLines.length < 2) return;
+
+            transfers.push({
+                kind: "shared",
+                stop: stopById.get(stopId),
+                lines: matchingLines
+            });
+        });
+
+        return transfers;
+    }
+
+    function createWalkingTransfers(stops, lines) {
+        const transfers = [];
+        const stopById = new Map(
+            stops.map(stop => [String(stop.id), stop])
+        );
+
+        const seenPairs = new Set();
+
+        lines.forEach((firstLine, firstIndex) => {
+            const firstRoute = Array.isArray(firstLine.route)
+                ? firstLine.route
+                : [];
+
+            lines.forEach((secondLine, secondIndex) => {
+                if (firstIndex >= secondIndex) return;
+
+                const secondRoute = Array.isArray(secondLine.route)
+                    ? secondLine.route
+                    : [];
+
+                const firstKey = String(
+                    firstLine.id ?? firstLine.lineNumber ?? firstIndex
+                );
+
+                const secondKey = String(
+                    secondLine.id ?? secondLine.lineNumber ?? secondIndex
+                );
+
+                if (firstKey === secondKey) return;
+
+                firstRoute.forEach(firstStopId => {
+                    secondRoute.forEach(secondStopId => {
+                        const firstId = String(firstStopId);
+                        const secondId = String(secondStopId);
+
+                        if (firstId === secondId) return;
+
+                        const stopA = stopById.get(firstId);
+                        const stopB = stopById.get(secondId);
+
+                        if (!stopA || !stopB) return;
+
+                        const coordinatesValid =
+                            Number.isFinite(Number(stopA.lat)) &&
+                            Number.isFinite(Number(stopA.lng)) &&
+                            Number.isFinite(Number(stopB.lat)) &&
+                            Number.isFinite(Number(stopB.lng));
+
+                        if (!coordinatesValid) return;
+
+                        const distance = calculateDistance(
+                            Number(stopA.lat),
+                            Number(stopA.lng),
+                            Number(stopB.lat),
+                            Number(stopB.lng)
+                        );
+
+                        if (distance <= 0 || distance > 300) return;
+
+                        const pairKey = [firstId, secondId]
+                            .sort()
+                            .join("-");
+
+                        if (seenPairs.has(pairKey)) return;
+
+                        seenPairs.add(pairKey);
+
+                        transfers.push({
+                            kind: "walking",
+                            stopA,
+                            stopB,
+                            lineA: firstLine,
+                            lineB: secondLine,
+                            distance: Math.round(distance),
+                            walkingMinutes: Math.max(
+                                1,
+                                Math.ceil(distance / 75)
+                            )
+                        });
+                    });
+                });
+            });
+        });
+
+        return transfers;
+    }
+
+    function addSharedTransferToMap(transfer) {
+        const stop = transfer.stop;
+
+        if (!Number.isFinite(Number(stop.lat)) ||
+            !Number.isFinite(Number(stop.lng))) return;
+
+        const marker = L.circleMarker(
+            [Number(stop.lat), Number(stop.lng)],
+            {
+                radius: 9,
+                color: "#004b87",
+                fillColor: "#007bff",
+                fillOpacity: 0.9,
+                weight: 2
+            }
+        );
+
+        marker.bindPopup(`
+            <strong>${escapeHTML(stop.name)}</strong><br>
+            ${escapeHTML(t("sharedStopPopup"))}<br>
+            ${escapeHTML(transfer.lines.map(getLineName).join(", "))}
+        `);
+
+        markerLayer.addLayer(marker);
+    }
+
+    function addWalkingTransferToMap(transfer) {
+        const a = transfer.stopA;
+        const b = transfer.stopB;
+
+        const pointA = [Number(a.lat), Number(a.lng)];
+        const pointB = [Number(b.lat), Number(b.lng)];
+
+        const markerA = L.circleMarker(pointA, {
+            radius: 7,
+            color: "#218838",
+            fillColor: "#28a745",
+            fillOpacity: 0.9,
+            weight: 2
+        });
+
+        const markerB = L.circleMarker(pointB, {
+            radius: 7,
+            color: "#218838",
+            fillColor: "#28a745",
+            fillOpacity: 0.9,
+            weight: 2
+        });
+
+        markerA.bindPopup(`
+            <strong>${escapeHTML(a.name)}</strong><br>
+            ${escapeHTML(getLineName(transfer.lineA))}
+        `);
+
+        markerB.bindPopup(`
+            <strong>${escapeHTML(b.name)}</strong><br>
+            ${escapeHTML(getLineName(transfer.lineB))}
+        `);
+
+        const connection = L.polyline(
+            [pointA, pointB],
+            {
+                color: "#28a745",
+                weight: 3,
+                dashArray: "8, 8"
+            }
+        );
+
+        connection.bindPopup(`
+            ${escapeHTML(t("walkingTransferPopup"))}<br>
+            ${transfer.distance} ${escapeHTML(t("meters"))}<br>
+            ${escapeHTML(t("approx"))} ${transfer.walkingMinutes} ${escapeHTML(t("minutesWalking"))}
+        `);
+
+        markerLayer.addLayer(markerA);
+        markerLayer.addLayer(markerB);
+        connectionLayer.addLayer(connection);
+    }
+
+    function drawMapTransfers() {
+        markerLayer.clearLayers();
+        connectionLayer.clearLayers();
+
+        sharedTransfers.forEach(addSharedTransferToMap);
+        walkingTransfers.forEach(addWalkingTransferToMap);
+    }
+
+    function renderSharedTransfer(transfer) {
+        return `
+            <div class="transfer-card">
+                <h4>${escapeHTML(transfer.stop.name)}</h4>
+
+                <p>
+                    <strong>${escapeHTML(t("transferTypeLabel"))}</strong>
+                    ${escapeHTML(t("sharedStopBetweenLines"))}
+                </p>
+
+                <p>${escapeHTML(t("transferHere"))}</p>
+
+                <div class="transfer-badges">
+                    ${getLineBadges(transfer.lines)}
+                </div>
+
+                <p style="margin-top: 12px;">
+                    <a href="stops.html">
+                        ${escapeHTML(t("viewStopsMap"))}
+                    </a>
+                </p>
+            </div>
+        `;
+    }
+
+    function renderWalkingTransfer(transfer) {
+        return `
+            <div class="transfer-card">
+                <h4>${escapeHTML(t("walkingConnection"))}</h4>
+
+                <p>
+                    <strong>${escapeHTML(transfer.stopA.name)}</strong>
+                    →
+                    <strong>${escapeHTML(transfer.stopB.name)}</strong>
+                </p>
+
+                <p>
+                    ${escapeHTML(getLineName(transfer.lineA))}
+                    →
+                    ${escapeHTML(getLineName(transfer.lineB))}
+                </p>
+
+                <p class="transfer-distance">
+                    ${transfer.distance} ${escapeHTML(t("meters"))}
+                    · ${escapeHTML(t("approx"))}
+                    ${transfer.walkingMinutes} ${escapeHTML(t("minutesWalking"))}
+                </p>
+
+                <div class="transfer-badges">
+                    <span class="transfer-badge walking">
+                        ${escapeHTML(t("walkingTransfer"))}
+                    </span>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderTransfers() {
+        let filtered = allTransfers;
+
+        if (activeFilter !== "all") {
+            filtered = allTransfers.filter(
+                transfer => transfer.kind === activeFilter
+            );
+        }
+
+        if (filtered.length === 0) {
+            transferList.innerHTML = `
+                <div class="transfer-empty">
+                    ${escapeHTML(t("noTransfersOfType"))}
+                </div>
+            `;
+            return;
+        }
+
+        transferList.innerHTML = filtered.map(transfer =>
+            transfer.kind === "shared"
+                ? renderSharedTransfer(transfer)
+                : renderWalkingTransfer(transfer)
+        ).join("");
+    }
+
+    function updateTransferStatus() {
+        transferStatus.textContent = t("transfersFound")
+            .replace("{shared}", sharedTransfers.length)
+            .replace("{walking}", walkingTransfers.length);
+    }
+
+    function setupFilters() {
+        document.querySelectorAll(".filter-button").forEach(button => {
+            button.addEventListener("click", () => {
+                document.querySelectorAll(".filter-button")
+                    .forEach(item => item.classList.remove("active"));
+
+                button.classList.add("active");
+                activeFilter = button.dataset.filter;
+
+                renderTransfers();
+            });
+        });
+    }
+
+    async function loadTransfers() {
+        try {
+            transferStatus.textContent = t("loadingFirebaseData");
+
+            const [stops, lines] = await Promise.all([
+                getStops(),
+                getLines()
+            ]);
+
+            if (!Array.isArray(stops) || !Array.isArray(lines)) {
+                throw new Error("Invalid Firebase data format.");
+            }
+
+            sharedTransfers = createSharedTransfers(stops, lines);
+
+            walkingTransfers = createWalkingTransfers(stops, lines)
+                .sort((a, b) => a.distance - b.distance);
+
+            allTransfers = [
+                ...sharedTransfers,
+                ...walkingTransfers
+            ];
+
+            sharedCount.textContent = sharedTransfers.length;
+            walkingCount.textContent = walkingTransfers.length;
+
+            drawMapTransfers();
+
+            if (allTransfers.length > 0) {
+                const points = [];
+
+                allTransfers.forEach(transfer => {
+                    if (transfer.kind === "shared") {
+                        points.push([
+                            Number(transfer.stop.lat),
+                            Number(transfer.stop.lng)
+                        ]);
+                    } else {
+                        points.push([
+                            Number(transfer.stopA.lat),
+                            Number(transfer.stopA.lng)
+                        ]);
+
+                        points.push([
+                            Number(transfer.stopB.lat),
+                            Number(transfer.stopB.lng)
+                        ]);
+                    }
+                });
+
+                const validPoints = points.filter(point =>
+                    Number.isFinite(point[0]) &&
+                    Number.isFinite(point[1])
+                );
+
+                if (validPoints.length > 0) {
+                    map.fitBounds(validPoints, {
+                        padding: [30, 30],
+                        maxZoom: 16
+                    });
+                }
+            }
+
+            dataLoaded = true;
+            updateTransferStatus();
+            renderTransfers();
+
+            setTimeout(() => map.invalidateSize(), 100);
+
+        } catch (error) {
+            console.error("Error loading transfers:", error);
+
+            transferStatus.textContent = t("transferLoadError");
+
+            transferList.innerHTML = `
+                <div class="transfer-empty">
+                    ${escapeHTML(t("transferDataLoadError"))}
+                </div>
+            `;
+        }
+    }
+
+    document.addEventListener("languageChanged", () => {
+        if (!dataLoaded) return;
+
+        updateTransferStatus();
+        renderTransfers();
+        drawMapTransfers();
+    });
+
+    setupFilters();
+    loadTransfers();
+</script>
+
+</body>
+</html>

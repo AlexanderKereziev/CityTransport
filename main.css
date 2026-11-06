@@ -433,3 +433,137 @@ footer {
     padding: 3px 8px;
     border-radius: 4px;
 }
+
+#route-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+#route-legend .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#route-legend .legend-color {
+    display: inline-block;
+    width: 24px;
+    height: 5px;
+    border-radius: 4px;
+}
+
+/* Контроли за показване на транспортните линии */
+.route-controls {
+    margin: 15px 0;
+    padding: 15px;
+    background: #f5f7fa;
+    border-radius: 10px;
+    border: 1px solid #dce3eb;
+}
+
+.route-controls > strong {
+    display: block;
+    margin-bottom: 10px;
+    color: #004b87;
+}
+
+#route-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.route-toggle {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    padding: 7px 12px;
+    background: white;
+    border: 1px solid #dce3eb;
+    border-radius: 7px;
+    font-size: 0.9rem;
+}
+
+.route-toggle input {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+.route-toggle-color {
+    display: inline-block;
+    width: 22px;
+    height: 5px;
+    border-radius: 4px;
+}
+
+.route-toggle:hover {
+    background: #edf4fa;
+}
+
+@media (max-width: 600px) {
+    #route-toggles {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+.nearby-controls {
+    margin-top: 15px;
+}
+
+.nearby-controls button {
+    padding: 10px 16px;
+    background: #1565c0;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.nearby-controls button:hover {
+    background: #0d47a1;
+}
+
+.nearby-controls button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+#nearby-status {
+    margin-top: 8px;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+/* ==========================================
+   LANGUAGE SWITCH
+   ========================================== */
+
+#language-toggle {
+    background-color: #ffffff;
+    color: #004b87;
+    border: 2px solid #ffffff;
+    border-radius: 5px;
+    padding: 7px 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#language-toggle:hover {
+    background-color: #e8f1f8;
+    color: #00345f;
+}
+
+@media (max-width: 850px) {
+    #language-toggle {
+        margin-top: 5px;
+    }
+}

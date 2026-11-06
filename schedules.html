@@ -4,77 +4,427 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="tran.svg" type="image/svg+xml">
-    <title>Разписания - Градски Транспорт</title>
+    <title data-i18n="schedulesPageTitle">Разписания - Градски Транспорт</title>
     <link rel="stylesheet" href="main.css">
+    <script src="translations.js" defer></script>
+
+    <style>
+        main {
+            max-width: 1000px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .schedule-intro {
+            margin-bottom: 28px;
+        }
+
+        .schedule-intro h3 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .schedule-intro p {
+            color: #666;
+        }
+
+        .line-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .line-button {
+            border: 2px solid #ddd;
+            background: white;
+            color: #333;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .line-button:hover {
+            border-color: #2878b5;
+            color: #2878b5;
+        }
+
+        .line-button.active {
+            background: #2878b5;
+            border-color: #2878b5;
+            color: white;
+        }
+
+        .timetable {
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e5e5e5;
+            overflow: hidden;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+        }
+
+        .timetable-header {
+            background: #f4f7fa;
+            padding: 22px 25px;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .timetable-header h4 {
+            font-size: 1.35rem;
+            margin: 0;
+        }
+
+        .timetable-body {
+            padding: 25px;
+        }
+
+        .departure-heading {
+            font-size: 1rem;
+            margin: 0 0 18px;
+            color: #555;
+        }
+
+        .departure-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+            gap: 12px;
+        }
+
+        .departure {
+            padding: 15px 10px;
+            text-align: center;
+            background: #f5f7f9;
+            border: 1px solid #e8ebee;
+            border-radius: 7px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #263b50;
+        }
+
+        .departure:hover {
+            background: #e7f1fa;
+            border-color: #2878b5;
+        }
+
+        .schedule-info {
+            margin-top: 20px;
+            padding: 14px 18px;
+            background: #f8f9fa;
+            border-left: 4px solid #2878b5;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .schedule-message {
+            padding: 25px;
+            text-align: center;
+            background: #f5f7f9;
+            border-radius: 8px;
+            color: #666;
+        }
+
+        .schedule-message.error {
+            color: #a52a2a;
+            background: #fdeaea;
+        }
+
+        @media (max-width: 600px) {
+            .timetable-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .departure-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .line-button {
+                flex: 1;
+                padding: 12px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-    <!-- 1. Главна навигация -->
-    <header>
-        <div class="brand">
-            <img src="tran.svg" alt="Лого на Градски Транспорт" class="logo">
-            <h2>Градски Транспорт</h2>
+<header>
+    <div class="brand">
+        <img
+            src="tran.svg"
+            alt="Лого на Градски Транспорт"
+            data-i18n-alt="brand"
+            class="logo"
+        >
+        <h2 data-i18n="brand">Градски Транспорт</h2>
+    </div>
+
+    <nav>
+        <a href="index.html" data-i18n="home">Начало</a>
+        <a href="plan.html" data-i18n="planning">Планиране</a>
+        <a href="lines.html" data-i18n="lines">Линии</a>
+        <a href="tran.html" data-i18n="transfers">Трансфери</a>
+        <a href="stops.html" data-i18n="stops">Спирки</a>
+        <a href="schedules.html" class="active" data-i18n="schedules">Разписания</a>
+        <a href="contact.html" data-i18n="contacts">Контакти</a>
+
+        <button id="language-toggle" type="button">🇬🇧 English</button>
+    </nav>
+</header>
+
+<hr>
+
+<main>
+
+    <section class="schedule-intro">
+        <h3 data-i18n="schedulesHeading">Разписания</h3>
+        <p data-i18n="schedulesIntro">
+            Изберете линия, за да проверите часовете на тръгване.
+        </p>
+    </section>
+
+    <section>
+        <div class="line-selector" id="line-selector">
+            <div class="schedule-message" data-i18n="loadingLinesSchedule">
+                Зареждане на линиите...
+            </div>
         </div>
 
-        <nav>
-            <a href="index.html">Начало</a>
-            <a href="plan.html">Планиране</a>
-            <a href="lines.html">Линии</a>
-            <a href="stops.html">Спирки</a>
-            <a href="schedules.html" class="active">Разписания</a>
-            <a href="contact.html">Контакти</a>
-        </nav>
-    </header>
-
-    <hr>
-
-    <!-- 2. Основна част -->
-    <main>
-        <!-- Избор на разписание -->
-        <section>
-            <h3>Избор на разписание по линия и спирка</h3>
-            <form action="schedules.php" method="GET" class="planner-form">
-                <div class="planner-inputs">
-                    <div class="input-group">
-                        <label for="select-line">Изберете линия:</label>
-                        <input type="text" id="select-line" name="line" placeholder="напр. Автобус 7">
-                    </div>
-                    <div class="input-group">
-                        <label for="select-stop">Изберете спирка:</label>
-                        <input type="text" id="select-stop" name="stop" placeholder="напр. Централна гара">
-                    </div>
-                </div>
-                <button type="submit" class="btn-plan">Покажи разписание</button>
-            </form>
-        </section>
-
-        <br>
-
-        <!-- Резултат / Разписание -->
-        <section>
-            <h3>Разписание за Автобус № 7 (Спирка: Централна гара)</h3>
-            <div class="route-card">
-                <div class="route-header">
-                    <span class="badge line-bus">Делничен ден</span>
-                    <span class="route-time">Посока: Ж.к. Младост</span>
-                </div>
-                <div class="route-details">
-                    <p><strong>Часове на тръгване:</strong></p>
-                    <p>05: <strong>15, 30, 45</strong></p>
-                    <p>06: <strong>00, 12, 24, 36, 48</strong></p>
-                    <p>07: <strong>00, 10, 20, 30, 40, 50</strong></p>
-                    <p>08: <strong>02, 15, 30, 45</strong></p>
-                </div>
+        <div id="schedule-results">
+            <div class="schedule-message" data-i18n="loadingSchedules">
+                Зареждане на разписанията...
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
 
-    <hr>
+</main>
 
-    <!-- 3. Футър -->
-    <footer>
-        <p>&copy; 2026 Градски Транспорт - Екип 1, XII "В" клас</p>
-    </footer>
+<hr>
+
+<footer>
+    <p data-i18n="footer">
+        © 2026 Градски Транспорт - Екип 1, XII "В" клас
+    </p>
+</footer>
+
+<script type="module">
+    import { getSchedules } from "./firebase.js";
+
+    const selector = document.getElementById("line-selector");
+    const results = document.getElementById("schedule-results");
+
+    const t = key => getTranslation(key);
+
+    const lineNames = {
+        line1: "bus7",
+        line2: "trolleybus5",
+        line3: "bus204"
+    };
+
+    let schedules = [];
+    let selectedLine = null;
+    let availableLineIds = [];
+    let loadingError = false;
+    let loaded = false;
+
+    function getLineName(lineId) {
+        const translationKey = lineNames[lineId];
+
+        return translationKey
+            ? t(translationKey)
+            : lineId;
+    }
+
+    function showLoading() {
+        selector.innerHTML = `
+            <div class="schedule-message">
+                ${t("loadingLinesSchedule")}
+            </div>
+        `;
+
+        results.innerHTML = `
+            <div class="schedule-message">
+                ${t("loadingSchedules")}
+            </div>
+        `;
+    }
+
+    async function loadSchedules() {
+        try {
+            const data = await getSchedules();
+
+            schedules = data.map(item => {
+                const schedule = typeof item.data === "function"
+                    ? item.data()
+                    : item;
+
+                return {
+                    ...schedule,
+                    id: item.id || schedule.id || ""
+                };
+            });
+
+            const activeSchedules = schedules.filter(
+                schedule => schedule.active === true
+            );
+
+            availableLineIds = [...new Set(
+                activeSchedules.map(schedule => schedule.lineId)
+            )];
+
+            loaded = true;
+
+            if (availableLineIds.length === 0) {
+                renderEmptySchedules();
+                return;
+            }
+
+            selectedLine = availableLineIds[0];
+
+            renderSelector();
+            renderSchedule();
+
+        } catch (error) {
+            console.error("Failed to load schedules:", error);
+
+            loadingError = true;
+            loaded = true;
+
+            renderError();
+        }
+    }
+
+    function renderEmptySchedules() {
+        selector.innerHTML = "";
+
+        results.innerHTML = `
+            <div class="schedule-message">
+                ${t("noActiveSchedules")}
+            </div>
+        `;
+    }
+
+    function renderError() {
+        selector.innerHTML = "";
+
+        results.innerHTML = `
+            <div class="schedule-message error">
+                ${t("scheduleLoadError")}
+            </div>
+        `;
+    }
+
+    function renderSelector() {
+        selector.innerHTML = "";
+
+        availableLineIds.forEach(lineId => {
+            const button = document.createElement("button");
+
+            button.className = "line-button";
+            button.textContent = getLineName(lineId);
+            button.type = "button";
+            button.dataset.lineId = lineId;
+
+            button.addEventListener("click", () => {
+                selectedLine = lineId;
+
+                renderSelector();
+                renderSchedule();
+            });
+
+            selector.appendChild(button);
+        });
+
+        const buttons = selector.querySelectorAll(".line-button");
+
+        buttons.forEach(button => {
+            button.classList.toggle(
+                "active",
+                button.dataset.lineId === selectedLine
+            );
+        });
+    }
+
+    function renderSchedule() {
+        const schedule = schedules.find(item =>
+            item.lineId === selectedLine &&
+            item.active === true
+        );
+
+        if (!schedule) {
+            results.innerHTML = `
+                <div class="schedule-message">
+                    ${t("noActiveScheduleForLine")}
+                </div>
+            `;
+            return;
+        }
+
+        const departures = (schedule.departures || [])
+            .slice()
+            .sort();
+
+        results.innerHTML = `
+            <div class="timetable">
+
+                <div class="timetable-header">
+                    <h4>${getLineName(selectedLine)}</h4>
+                </div>
+
+                <div class="timetable-body">
+                    <p class="departure-heading">
+                        <strong>${t("departureHeading")}</strong>
+                    </p>
+
+                    <div class="departure-grid">
+                        ${departures.length > 0
+                            ? departures.map(time => `
+                                <div class="departure">${time}</div>
+                            `).join("")
+                            : `<p>${t("noDepartures")}</p>`
+                        }
+                    </div>
+
+                    <div class="schedule-info">
+                        ${t("scheduleInfo")}
+                    </div>
+                </div>
+
+            </div>
+        `;
+    }
+
+    // Refresh dynamically generated text when the language changes.
+    document.addEventListener("languageChanged", () => {
+        if (!loaded) {
+            showLoading();
+            return;
+        }
+
+        if (loadingError) {
+            renderError();
+            return;
+        }
+
+        if (availableLineIds.length === 0) {
+            renderEmptySchedules();
+            return;
+        }
+
+        renderSelector();
+        renderSchedule();
+    });
+
+    loadSchedules();
+</script>
 
 </body>
 </html>

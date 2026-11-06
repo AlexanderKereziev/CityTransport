@@ -1,100 +1,689 @@
+
 <!DOCTYPE html>
 <html lang="bg">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#176b55">
     <link rel="icon" href="tran.svg" type="image/svg+xml">
-    <title>Планиране на пътуване - Градски Транспорт</title>
+    <title data-i18n="planPageTitle">Планиране на пътуване - Градски Транспорт</title>
     <link rel="stylesheet" href="main.css">
+    <script src="translations.js" defer></script>
+
+    <style>
+        .planner-section, .results-section {
+            max-width: 950px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+        .planner-form { display: grid; gap: 1rem; }
+        .planner-inputs {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: .45rem;
+        }
+        .input-group input, .input-group select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: .8rem;
+            border: 1px solid #cbd5d1;
+            border-radius: 8px;
+            font: inherit;
+            background: white;
+            color: #17231f;
+        }
+        .input-group.short { max-width: 240px; }
+        .planner-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: .75rem;
+        }
+        .btn-plan, .btn-swap {
+            border: 0;
+            border-radius: 8px;
+            padding: .8rem 1.2rem;
+            font: inherit;
+            cursor: pointer;
+        }
+        .btn-plan {
+            background: #176b55;
+            color: white;
+            font-weight: 600;
+        }
+        .btn-plan:hover { background: #125541; }
+        .btn-swap {
+            background: #e8f1ed;
+            color: #176b55;
+        }
+        .planner-status {
+            margin: .8rem 0;
+            color: #53635d;
+        }
+        .planner-status.error { color: #a12d2d; }
+        .route-card {
+            background: white;
+            border: 1px solid #dce5e0;
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin: 1rem 0;
+        }
+        .route-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: .7rem;
+        }
+        .route-header .badge {
+            display: inline-block;
+            background: #e5f3ed;
+            color: #176b55;
+            border-radius: 20px;
+            padding: .35rem .7rem;
+            font-weight: 700;
+        }
+        .route-time {
+            color: #176b55;
+            font-weight: 600;
+        }
+        .route-details { margin: 1rem 0; }
+        .route-stop {
+            display: flex;
+            gap: .75rem;
+            align-items: flex-start;
+            padding: .35rem 0;
+        }
+        .route-stop::before {
+            content: "●";
+            color: #176b55;
+        }
+        .route-stop.intermediate::before {
+            content: "○";
+            color: #84958d;
+        }
+        .route-meta {
+            color: #53635d;
+            font-size: .95rem;
+        }
+        .route-transfer {
+            margin: .35rem 0 .35rem 1.2rem;
+            color: #8a5a16;
+            font-size: .9rem;
+            font-weight: 600;
+        }
+        .empty-state {
+            padding: 1rem;
+            border-radius: 8px;
+            background: #f4f7f5;
+            color: #53635d;
+        }
+        @media (max-width: 650px) {
+            .planner-inputs { grid-template-columns: 1fr; }
+            .input-group.short { max-width: none; }
+            .planner-section, .results-section {
+                padding: 1rem;
+                margin: 1rem auto;
+            }
+        }
+    </style>
 </head>
+
 <body>
+<header>
+    <div class="brand">
+        <img src="tran.svg" alt="Лого на Градски Транспорт" class="logo" data-i18n-alt="brand">
+        <h2 data-i18n="brand">Градски Транспорт</h2>
+    </div>
 
-    <!-- 1. Главна навигация -->
-    <header>
-        <div class="brand">
-            <img src="tran.svg" alt="Лого на Градски Транспорт" class="logo">
-            <h2>Градски Транспорт</h2>
+    <nav>
+        <a href="index.html" data-i18n="home">Начало</a>
+        <a href="plan.html" class="active" data-i18n="planning">Планиране</a>
+        <a href="lines.html" data-i18n="lines">Линии</a>
+        <a href="tran.html" data-i18n="transfers">Трансфери</a>
+        <a href="stops.html" data-i18n="stops">Спирки</a>
+        <a href="schedules.html" data-i18n="schedules">Разписания</a>
+        <a href="contact.html" data-i18n="contacts">Контакти</a>
+        <button id="language-toggle" type="button">🇬🇧 English</button>
+    </nav>
+</header>
+
+<hr>
+
+<main>
+    <section class="planner-section">
+        <h3 data-i18n="plannerTitle">Планирайте своето пътуване</h3>
+
+        <p data-i18n="plannerIntro">
+            Изберете начална и крайна спирка.
+            Ще потърсим директни маршрути и маршрути с едно прекачване
+            и ще изчислим времето за пътуване.
+        </p>
+
+        <form id="plannerForm" class="planner-form">
+            <div class="planner-inputs">
+                <div class="input-group">
+                    <label for="from_stop" data-i18n="fromStopLabel">Начална спирка (От):</label>
+                    <select id="from_stop" required>
+                        <option value="" data-i18n="loadingStops">Зареждане на спирките...</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="to_stop" data-i18n="toStopLabel">Крайна спирка (До):</label>
+                    <select id="to_stop" required>
+                        <option value="" data-i18n="loadingStops">Зареждане на спирките...</option>
+                    </select>
+                </div>
+
+                <div class="input-group short">
+                    <label for="travel_time" data-i18n="departureTimeLabel">Час на тръгване:</label>
+                    <input type="time" id="travel_time">
+                </div>
+            </div>
+
+            <div class="planner-actions">
+                <button type="button" id="swapStops" class="btn-swap" data-i18n="swapStops">
+                    ↕ Размени спирките
+                </button>
+
+                <button type="submit" id="searchButton" class="btn-plan" data-i18n="searchRoute">
+                    Търси маршрут
+                </button>
+            </div>
+        </form>
+
+        <p id="plannerStatus" class="planner-status" role="status" aria-live="polite" data-i18n="loadingPlanner">
+            Зареждане на данните...
+        </p>
+    </section>
+
+    <section class="results-section" aria-live="polite">
+        <h3 data-i18n="suggestedRoutes">Предложени маршрути</h3>
+        <div id="routeResults">
+            <p class="empty-state" data-i18n="chooseStopsPrompt">
+                Изберете две спирки и натиснете „Търси маршрут“.
+            </p>
         </div>
+    </section>
+</main>
 
-        <nav>
-            <a href="index.html">Начало</a>
-            <a href="plan.html" class="active">Планиране</a>
-            <a href="lines.html">Линии</a>
-            <a href="stops.html">Спирки</a>
-            <a href="schedules.html">Разписания</a>
-            <a href="contact.html">Контакти</a>
-        </nav>
-    </header>
+<hr>
 
-    <hr>
+<footer>
+    <p data-i18n="plannerFooter">© 2026 Градски Транспорт - Екип 1, XII "В" клас</p>
+</footer>
 
-    <!-- 2. Основна част за планиране -->
-    <main>
-        <!-- Секция с форма за планиране -->
-        <section class="planner-section">
-            <h3>Планирайте своето пътуване</h3>
-            <p>Въведете началната и крайната спирка, за да намерите най-удобния маршрут и линия.</p>
-            
-            <form action="plan.html" method="GET" class="planner-form">
-                <div class="planner-inputs">
-                    <div class="input-group">
-                        <label for="from_stop">Начална спирка (От):</label>
-                        <input type="text" id="from_stop" name="from_stop" placeholder="напр. Централна гара" required>
-                    </div>
+<script type="module">
+    import { getStops, getLines, getSchedules } from "./firebase.js";
 
-                    <div class="input-group">
-                        <label for="to_stop">Крайна спирка (До):</label>
-                        <input type="text" id="to_stop" name="to_stop" placeholder="напр. Университет" required>
-                    </div>
+    const fromSelect = document.getElementById("from_stop");
+    const toSelect = document.getElementById("to_stop");
+    const timeInput = document.getElementById("travel_time");
+    const form = document.getElementById("plannerForm");
+    const results = document.getElementById("routeResults");
+    const status = document.getElementById("plannerStatus");
 
-                    <div class="input-group short">
-                        <label for="travel_time">Час на тръгване:</label>
-                        <input type="time" id="travel_time" name="travel_time">
-                    </div>
-                </div>
+    let stops = [];
+    let lines = [];
+    let schedules = [];
+    let lastStatusKey = "loadingPlanner";
+    let lastStatusValues = {};
+    let lastStatusError = false;
+    let lastResults = null;
 
-                <button type="submit" class="btn-plan">Търси маршрут</button>
-            </form>
-        </section>
+    const text = value => value == null ? "" : String(value);
 
-        <!-- Пример за резултат от търсенето (структура за показване на данни) -->
-        <section class="results-section">
-            <h3>Предложени маршрути</h3>
-            
-            <div class="route-card">
-                <div class="route-header">
-                    <span class="badge line-bus">Автобус 1</span>
-                    <span class="route-time">Времетраене: ~15 мин.</span>
-                </div>
-                <div class="route-details">
-                    <p><strong>От:</strong> Централна гара (10:15 ч.)</p>
-                    <p><strong>До:</strong> Университет (10:30 ч.)</p>
-                    <p class="route-stops-count">Брой спирки по маршрута: 5 спирки</p>
-                </div>
-                <a href="schedules.html" class="btn-details">Виж пълното разписание</a>
+    const getStopId = value => {
+        if (typeof value === "string" || typeof value === "number") {
+            return String(value);
+        }
+        if (!value || typeof value !== "object") return "";
+        return text(value.stopId ?? value.stop_id ?? value.id ?? value.docId ?? value.code);
+    };
+
+    const getLineName = line => text(
+        line.lineNumber ?? line.number ?? line.line ?? line.name ?? line.id ?? "Линия"
+    );
+
+    const getLineType = line => text(
+        line.type ?? line.vehicleType ?? line.transport ?? ""
+    );
+
+    const getOrderedStopIds = line => {
+        const raw = line.route ?? line.stopIds ?? line.stop_ids ??
+            line.stops ?? line.stopSequence ?? line.stop_sequence;
+
+        if (!Array.isArray(raw)) return [];
+        return raw.map(getStopId).filter(Boolean);
+    };
+
+    const escapeHtml = value => text(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[char]));
+
+    function t(key, values = {}) {
+        return escapeHtml(getTranslation(key, values));
+    }
+
+    function setStatus(key, values = {}, isError = false) {
+        lastStatusKey = key;
+        lastStatusValues = values;
+        lastStatusError = isError;
+        status.textContent = getTranslation(key, values);
+        status.classList.toggle("error", isError);
+    }
+
+    function stopName(id) {
+        return stops.find(stop => text(stop.id) === text(id))?.name || id;
+    }
+
+    function fillStopSelect(select) {
+        const selectedValue = select.value;
+
+        select.innerHTML = `<option value="">${t("selectStop")}</option>`;
+
+        [...stops]
+            .sort((a, b) => text(a.name).localeCompare(text(b.name), "bg"))
+            .forEach(stop => {
+                const option = document.createElement("option");
+                option.value = text(stop.id);
+                option.textContent = text(stop.name || stop.id);
+                select.appendChild(option);
+            });
+
+        if (stops.some(stop => text(stop.id) === selectedValue)) {
+            select.value = selectedValue;
+        }
+    }
+
+    function segmentDuration(line, originalRoute, segment) {
+        const times = line.travelTimes;
+        if (!Array.isArray(times) || segment.length < 2) return null;
+
+        let total = 0;
+
+        for (let i = 0; i < segment.length - 1; i++) {
+            const a = originalRoute.indexOf(segment[i]);
+            const b = originalRoute.indexOf(segment[i + 1]);
+
+            if (a < 0 || b < 0 || Math.abs(a - b) !== 1) return null;
+
+            const value = Number(times[Math.min(a, b)]);
+            if (!Number.isFinite(value) || value < 0) return null;
+
+            total += value;
+        }
+
+        return total;
+    }
+
+    function getScheduleFor(line, fromId, requestedMinutes) {
+        const lineId = text(
+            line.id ?? line.lineId ?? line.line_id ?? line.lineNumber ?? line.number
+        );
+        const lineNumber = getLineName(line);
+
+        const matching = schedules.filter(item => {
+            const itemLine = text(
+                item.lineId ?? item.line_id ?? item.lineNumber ?? item.number ?? item.line
+            );
+
+            return itemLine && (itemLine === lineId || itemLine === lineNumber);
+        });
+
+        const candidates = [];
+
+        for (const item of matching) {
+            const rawTime = item.departureTime ?? item.departure ??
+                item.time ?? item.departure_time;
+
+            const match = text(rawTime).match(/(?:^|T)(\d{1,2}):(\d{2})/);
+            if (!match) continue;
+
+            const stopId = text(
+                item.stopId ?? item.stop_id ?? item.fromStopId ?? item.from_stop_id
+            );
+
+            if (stopId && stopId !== fromId) continue;
+
+            let minute = Number(match[1]) * 60 + Number(match[2]);
+            if (requestedMinutes != null && minute < requestedMinutes) {
+                minute += 1440;
+            }
+
+            candidates.push({ minute, raw: item });
+        }
+
+        candidates.sort((a, b) => a.minute - b.minute);
+        return candidates[0] || null;
+    }
+
+    function formatTime(minutes) {
+        if (minutes == null) return "";
+
+        const normalized = ((minutes % 1440) + 1440) % 1440;
+
+        return (
+            String(Math.floor(normalized / 60)).padStart(2, "0") +
+            ":" +
+            String(normalized % 60).padStart(2, "0")
+        );
+    }
+
+    function makeDirectRoutes(fromId, toId, requestedMinutes) {
+        const found = [];
+
+        for (const line of lines) {
+            const original = getOrderedStopIds(line);
+            const orientations = [original, [...original].reverse()];
+
+            for (const sequence of orientations) {
+                const fromIndex = sequence.indexOf(fromId);
+                const toIndex = sequence.indexOf(toId);
+
+                if (fromIndex < 0 || toIndex <= fromIndex) continue;
+
+                const segment = sequence.slice(fromIndex, toIndex + 1);
+                const duration = segmentDuration(line, original, segment);
+                const schedule = getScheduleFor(line, fromId, requestedMinutes);
+                const departure = schedule?.minute ?? requestedMinutes ?? null;
+
+                found.push({
+                    kind: "direct",
+                    line,
+                    lineLabel: `${getLineType(line)} ${getLineName(line)}`.trim(),
+                    sequence: segment,
+                    departure,
+                    arrival: departure != null && duration != null
+                        ? departure + duration : null,
+                    duration,
+                    transferCount: 0
+                });
+            }
+        }
+
+        return found;
+    }
+
+    function makeTransferRoutes(fromId, toId, requestedMinutes) {
+        const found = [];
+        const oriented = [];
+
+        for (const line of lines) {
+            const original = getOrderedStopIds(line);
+            if (original.length < 2) continue;
+
+            oriented.push({ line, original, sequence: original });
+            oriented.push({ line, original, sequence: [...original].reverse() });
+        }
+
+        for (const first of oriented) {
+            const start = first.sequence.indexOf(fromId);
+            if (start < 0) continue;
+
+            const firstFromStart = first.sequence.slice(start);
+            if (firstFromStart.length < 2) continue;
+
+            for (const second of oriented) {
+                if (text(first.line.id) === text(second.line.id)) continue;
+
+                const end = second.sequence.indexOf(toId);
+                if (end < 1) continue;
+
+                for (let i = 1; i < firstFromStart.length; i++) {
+                    const transferId = firstFromStart[i];
+                    const transferIndex = second.sequence.indexOf(transferId);
+
+                    if (transferIndex < 0 || transferIndex >= end) continue;
+
+                    const firstSequence = firstFromStart.slice(0, i + 1);
+                    const secondSequence = second.sequence.slice(transferIndex, end + 1);
+
+                    const leg1Duration = segmentDuration(
+                        first.line, first.original, firstSequence
+                    );
+                    const leg2Duration = segmentDuration(
+                        second.line, second.original, secondSequence
+                    );
+
+                    const duration = leg1Duration != null && leg2Duration != null
+                        ? leg1Duration + leg2Duration : null;
+
+                    const schedule = getScheduleFor(first.line, fromId, requestedMinutes);
+                    const departure = schedule?.minute ?? requestedMinutes ?? null;
+
+                    found.push({
+                        kind: "transfer",
+                        firstLine: first.line,
+                        secondLine: second.line,
+                        firstSequence,
+                        secondSequence,
+                        transferId,
+                        departure,
+                        duration,
+                        arrival: departure != null && duration != null
+                            ? departure + duration : null,
+                        transferCount: 1
+                    });
+                }
+            }
+        }
+
+        const unique = new Map();
+
+        for (const route of found) {
+            const key = [
+                route.firstLine.id ?? getLineName(route.firstLine),
+                route.secondLine.id ?? getLineName(route.secondLine),
+                route.firstSequence.join(">"),
+                route.secondSequence.join(">")
+            ].join("|");
+
+            if (!unique.has(key)) unique.set(key, route);
+        }
+
+        return [...unique.values()];
+    }
+
+    function renderStopSequence(sequence) {
+        return sequence.map((id, index) => `
+            <div class="route-stop ${
+                index > 0 && index < sequence.length - 1 ? "intermediate" : ""
+            }">
+                <span>${escapeHtml(stopName(id))}</span>
             </div>
+        `).join("");
+    }
 
-            <div class="route-card">
+    function renderRoute(route) {
+        const isTransfer = route.kind === "transfer";
+
+        const lineLabel = isTransfer
+            ? `${getLineType(route.firstLine)} ${getLineName(route.firstLine)} + ${getLineType(route.secondLine)} ${getLineName(route.secondLine)}`
+            : route.lineLabel;
+
+        const durationLabel = route.duration != null
+            ? t("travelDuration", { minutes: route.duration })
+            : t("noTravelTimes");
+
+        const timeLabel = route.departure != null
+            ? t("departureTime", { time: formatTime(route.departure) })
+            : t("chooseTimeForSchedule");
+
+        let details;
+
+        if (isTransfer) {
+            details =
+                renderStopSequence(route.firstSequence) +
+                `<p class="route-transfer">${t("transferAt", {
+                    stop: stopName(route.transferId)
+                })}</p>` +
+                renderStopSequence(route.secondSequence.slice(1));
+        } else {
+            details = renderStopSequence(route.sequence);
+        }
+
+        const stopCount = isTransfer
+            ? route.firstSequence.length + route.secondSequence.length - 2
+            : route.sequence.length - 1;
+
+        return `
+            <article class="route-card">
                 <div class="route-header">
-                    <span class="badge line-trolley">Тролей 2</span>
-                    <span class="route-time">Времетраене: ~20 мин.</span>
+                    <span class="badge">${escapeHtml(lineLabel)}</span>
+                    <span class="route-time">${durationLabel}</span>
                 </div>
+
                 <div class="route-details">
-                    <p><strong>От:</strong> Централна гара (10:20 ч.)</p>
-                    <p><strong>До:</strong> Университет (10:40 ч.)</p>
-                    <p class="route-stops-count">Брой спирки по маршрута: 7 спирки</p>
+                    <p><strong>${timeLabel}</strong></p>
+                    ${details}
+                    <p class="route-meta">
+                        ${isTransfer ? t("oneTransfer") : t("noTransfer")}
+                        · ${t("routeSegments", { count: stopCount })}
+                    </p>
+                    ${isTransfer ? `<p class="route-meta">${t("transferWaitingNote")}</p>` : ""}
                 </div>
-                <a href="schedules.html" class="btn-details">Виж пълното разписание</a>
-            </div>
-        </section>
-    </main>
 
-    <hr>
+                <a href="schedules.html" class="btn-details">
+                    ${t("viewSchedulesButton")}
+                </a>
+            </article>
+        `;
+    }
 
-    <!-- 3. Футър -->
-    <footer>
-        <p>&copy; 2026 Градски Транспорт - Екип 1, XII "В" клас</p>
-    </footer>
+    function renderResults() {
+        if (!lastResults) return;
+
+        if (lastResults.type === "empty") {
+            results.innerHTML = `
+                <p class="empty-state">${t("noRouteFound", {
+                    from: stopName(lastResults.from),
+                    to: stopName(lastResults.to)
+                })}</p>
+            `;
+            return;
+        }
+
+        results.innerHTML = lastResults.routes
+            .slice(0, 10)
+            .map(renderRoute)
+            .join("");
+    }
+
+    async function initialize() {
+        try {
+            const [stopData, lineData, scheduleData] = await Promise.all([
+                getStops(),
+                getLines().catch(() => []),
+                getSchedules().catch(() => [])
+            ]);
+
+            stops = Array.isArray(stopData) ? stopData : [];
+            lines = Array.isArray(lineData) ? lineData : [];
+            schedules = Array.isArray(scheduleData) ? scheduleData : [];
+
+            fillStopSelect(fromSelect);
+            fillStopSelect(toSelect);
+
+            if (stops.length < 2) {
+                setStatus("insufficientStops", {}, true);
+                return;
+            }
+
+            const usableLines = lines.filter(
+                line => getOrderedStopIds(line).length >= 2
+            );
+
+            if (!usableLines.length) {
+                setStatus("noUsableLines", {}, true);
+            } else {
+                setStatus("loadedData", {
+                    stops: stops.length,
+                    lines: usableLines.length,
+                    schedules: schedules.length
+                });
+            }
+        } catch (error) {
+            console.error("Грешка при зареждане на данните:", error);
+
+            setStatus("plannerLoadError", {}, true);
+
+            fromSelect.innerHTML = `<option value="">${t("plannerLoadError")}</option>`;
+            toSelect.innerHTML = `<option value="">${t("plannerLoadError")}</option>`;
+        }
+    }
+
+    form.addEventListener("submit", event => {
+        event.preventDefault();
+
+        const fromId = fromSelect.value;
+        const toId = toSelect.value;
+
+        if (!fromId || !toId) {
+            setStatus("selectBothStops", {}, true);
+            return;
+        }
+
+        if (fromId === toId) {
+            setStatus("sameStopsError", {}, true);
+            return;
+        }
+
+        const requestedMinutes = timeInput.value
+            ? Number(timeInput.value.slice(0, 2)) * 60 +
+              Number(timeInput.value.slice(3, 5))
+            : null;
+
+        const directRoutes = makeDirectRoutes(fromId, toId, requestedMinutes);
+        const transferRoutes = makeTransferRoutes(fromId, toId, requestedMinutes);
+
+        const routes = [...directRoutes, ...transferRoutes];
+
+        routes.sort((a, b) => {
+            if (a.duration != null && b.duration != null) {
+                return a.duration - b.duration;
+            }
+            if (a.duration != null) return -1;
+            if (b.duration != null) return 1;
+            return a.transferCount - b.transferCount;
+        });
+
+        if (!routes.length) {
+            lastResults = { type: "empty", from: fromId, to: toId };
+            renderResults();
+            return;
+        }
+
+        lastResults = { type: "routes", routes };
+        renderResults();
+
+        setStatus("routesFound", { count: routes.length });
+    });
+
+    document.getElementById("swapStops").addEventListener("click", () => {
+        const from = fromSelect.value;
+        const to = toSelect.value;
+
+        fromSelect.value = to;
+        toSelect.value = from;
+    });
+
+    // Re-render dynamic messages and route cards after a language switch.
+    document.addEventListener("languageChanged", () => {
+        setStatus(lastStatusKey, lastStatusValues, lastStatusError);
+        renderResults();
+        fillStopSelect(fromSelect);
+        fillStopSelect(toSelect);
+    });
+
+    initialize();
+</script>
 
 </body>
 </html>

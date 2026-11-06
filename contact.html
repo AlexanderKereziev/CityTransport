@@ -4,9 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="icon" href="tran.svg" type="image/svg+xml">
-    <title>Контакти - Градски Транспорт Гоце Делчев</title>
+    <title data-i18n="contactPageTitle">Контакти - Градски Транспорт Гоце Делчев</title>
+
     <link rel="stylesheet" href="main.css">
+    <script src="translations.js" defer></script>
 
     <style>
         section form textarea {
@@ -28,33 +31,46 @@
 </head>
 <body>
 
-    <!-- Главна навигация -->
+    <!-- Main navigation -->
     <header>
         <div class="brand">
-            <img src="tran.svg" alt="Лого на Градски Транспорт" class="logo">
-            <h2>Градски Транспорт - Гоце Делчев</h2>
+            <img
+                src="tran.svg"
+                alt="Лого на Градски Транспорт"
+                data-i18n-alt="brand"
+                class="logo"
+            >
+
+            <h2 data-i18n="contactBrand">
+                Градски Транспорт - Гоце Делчев
+            </h2>
         </div>
 
         <nav>
-            <a href="index.html">Начало</a>
-            <a href="plan.html">Планиране</a>
-            <a href="lines.html">Линии</a>
-            <a href="stops.html">Спирки</a>
-            <a href="schedules.html">Разписания</a>
-            <a href="contact.html" class="active">Контакти</a>
+            <a href="index.html" data-i18n="home">Начало</a>
+            <a href="plan.html" data-i18n="planning">Планиране</a>
+            <a href="lines.html" data-i18n="lines">Линии</a>
+            <a href="tran.html" data-i18n="transfers">Трансфери</a>
+            <a href="stops.html" data-i18n="stops">Спирки</a>
+            <a href="schedules.html" data-i18n="schedules">Разписания</a>
+            <a href="contact.html" class="active" data-i18n="contacts">Контакти</a>
+
+            <button id="language-toggle" type="button">
+                🇬🇧 English
+            </button>
         </nav>
     </header>
 
     <hr>
 
-    <!-- Основна част -->
+    <!-- Main content -->
     <main>
 
-        <!-- Информация за контакти -->
+        <!-- Contact information -->
         <section>
-            <h3>Информация за връзка</h3>
+            <h3 data-i18n="contactInfoTitle">Информация за връзка</h3>
 
-            <p>
+            <p data-i18n="contactIntro">
                 Имате въпроси, предложения или искате да подадете сигнал
                 относно разписанията и обслужването на градския транспорт
                 в гр. Гоце Делчев? Свържете се с нашия екип.
@@ -63,35 +79,59 @@
             <br>
 
             <div class="route-details">
-                <p><strong>📍 Адрес на управление:</strong> гр. Гоце Делчев, ул. „Търговска“ № 1 (ПМГ „Яне Сандански“)</p>
-                <p><strong>📞 Телефон за връзка:</strong> +359 888 123 456</p>
-                <p><strong>✉️ Имейл адрес:</strong> transport@gotse-delchev.bg</p>
-                <p><strong>⏰ Работно време:</strong> Понеделник - Петък: 08:30 – 17:30 ч.</p>
+                <p>
+                    <strong data-i18n="addressLabel">📍 Адрес на управление:</strong>
+                    <span data-i18n="addressValue">гр. Гоце Делчев, ул. „Търговска“ № 1 (ПМГ „Яне Сандански“)</span>
+                </p>
+
+                <p>
+                    <strong data-i18n="phoneLabel">📞 Телефон за връзка:</strong>
+                    +359 888 123 456
+                </p>
+
+                <p>
+                    <strong data-i18n="emailLabel">✉️ Имейл адрес:</strong>
+                    transport@gotse-delchev.bg
+                </p>
+
+                <p>
+                    <strong data-i18n="workingHoursLabel">⏰ Работно време:</strong>
+                    <span data-i18n="workingHoursValue">Понеделник - Петък: 08:30 – 17:30 ч.</span>
+                </p>
             </div>
         </section>
 
         <br>
 
-        <!-- Форма за обратна връзка -->
+        <!-- Contact form -->
         <section>
-            <h3>Изпратете ни съобщение или сигнал</h3>
+            <h3 data-i18n="contactFormTitle">
+                Изпратете ни съобщение или сигнал
+            </h3>
 
             <form id="contactForm" class="planner-form">
 
                 <div class="planner-inputs">
                     <div class="input-group">
-                        <label for="contact-name">Име и фамилия:</label>
+                        <label for="contact-name" data-i18n="nameLabel">
+                            Име и фамилия:
+                        </label>
+
                         <input
                             type="text"
                             id="contact-name"
                             name="fullName"
                             placeholder="Въведете вашето име..."
+                            data-i18n-placeholder="namePlaceholder"
                             required
                         >
                     </div>
 
                     <div class="input-group">
-                        <label for="contact-email">Имейл адрес:</label>
+                        <label for="contact-email" data-i18n="emailFieldLabel">
+                            Имейл адрес:
+                        </label>
+
                         <input
                             type="email"
                             id="contact-email"
@@ -104,12 +144,16 @@
 
                 <div class="planner-inputs" style="margin-top: 10px;">
                     <div class="input-group" style="flex: 1;">
-                        <label for="contact-subject">Тема на съобщението:</label>
+                        <label for="contact-subject" data-i18n="subjectLabel">
+                            Тема на съобщението:
+                        </label>
+
                         <input
                             type="text"
                             id="contact-subject"
                             name="subject"
                             placeholder="напр. Закъснение на автобус № 1"
+                            data-i18n-placeholder="subjectPlaceholder"
                             required
                         >
                     </div>
@@ -117,18 +161,22 @@
 
                 <div class="planner-inputs" style="margin-top: 10px;">
                     <div class="input-group" style="flex: 1;">
-                        <label for="contact-message">Вашето съобщение:</label>
+                        <label for="contact-message" data-i18n="messageLabel">
+                            Вашето съобщение:
+                        </label>
+
                         <textarea
                             id="contact-message"
                             name="message"
                             placeholder="Опишете подробно вашето запитване, препоръка или сигнал тук..."
+                            data-i18n-placeholder="messagePlaceholder"
                             required
                         ></textarea>
                     </div>
                 </div>
 
                 <div style="margin-top: 15px;">
-                    <button type="submit" class="btn-plan" id="submitButton">
+                    <button type="submit" class="btn-plan" id="submitButton" data-i18n="sendMessage">
                         Изпрати съобщение
                     </button>
                 </div>
@@ -142,9 +190,11 @@
 
     <hr>
 
-    <!-- Футър -->
+    <!-- Footer -->
     <footer>
-        <p>&copy; 2026 Градски Транспорт - Екип 1, XII "В" клас, ПМГ "Яне Сандански"</p>
+        <p data-i18n="contactFooter">
+            © 2026 Градски Транспорт - Екип 1, XII "В" клас
+        </p>
     </footer>
 
     <!-- Firebase integration -->
@@ -172,30 +222,26 @@
             };
 
             submitButton.disabled = true;
-            submitButton.textContent = "Изпращане...";
+            submitButton.textContent = getTranslation("sendingMessage");
             formStatus.textContent = "";
 
             try {
                 await sendContactMessage(data);
 
-                formStatus.textContent =
-                    "Съобщението беше изпратено успешно! Благодарим Ви.";
-
+                formStatus.textContent = getTranslation("contactSuccess");
                 formStatus.style.color = "green";
 
                 contactForm.reset();
 
             } catch (error) {
-                console.error("Грешка при изпращане:", error);
+                console.error("Error sending message:", error);
 
-                formStatus.textContent =
-                    "Възникна грешка при изпращането. Моля, опитайте отново.";
-
+                formStatus.textContent = getTranslation("contactError");
                 formStatus.style.color = "red";
 
             } finally {
                 submitButton.disabled = false;
-                submitButton.textContent = "Изпрати съобщение";
+                submitButton.textContent = getTranslation("sendMessage");
             }
         });
     </script>

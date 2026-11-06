@@ -1,74 +1,127 @@
+
 <!DOCTYPE html>
 <html lang="bg">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="icon" href="tran.svg" type="image/svg+xml">
-    <title>Градски Транспорт</title>
+    <title data-i18n="pageTitle">Градски Транспорт</title>
+
     <link rel="stylesheet" href="main.css">
+
+    <script src="translations.js" defer></script>
 </head>
 <body>
 
-    <!-- 1. Главна навигация -->
+    <!-- Main navigation -->
     <header>
-        <!-- Блок за лого и заглавие (горе вляво) -->
         <div class="brand">
-            <img src="tran.svg" alt="Лого на Градски Транспорт" class="logo">
-            <h2>Градски Транспорт</h2>
+            <img
+                src="tran.svg"
+                alt="Лого на Градски Транспорт"
+                data-i18n-alt="brand"
+                class="logo"
+            >
+
+            <h2 data-i18n="brand">Градски Транспорт</h2>
         </div>
 
         <nav>
-            <a href="index.html">Начало</a>
-            <a href="plan.html">Планиране</a>
-            <a href="lines.html">Линии</a>
-            <a href="stops.html">Спирки</a>
-            <a href="schedules.html">Разписания</a>
-            <a href="contact.html">Контакти</a>
+            <a href="index.html" data-i18n="home">Начало</a>
+            <a href="plan.html" data-i18n="planning">Планиране</a>
+            <a href="lines.html" data-i18n="lines">Линии</a>
+            <a href="tran.html" data-i18n="transfers">Трансфери</a>
+            <a href="stops.html" data-i18n="stops">Спирки</a>
+            <a href="schedules.html" data-i18n="schedules">Разписания</a>
+            <a href="contact.html" data-i18n="contacts">Контакти</a>
+
+            <button id="language-toggle" type="button">
+                🇬🇧 English
+            </button>
         </nav>
     </header>
 
     <hr>
 
-    <!-- 2. Основна част -->
+    <!-- Main content -->
     <main>
-        <!-- Търсачка -->
+
+        <!-- Search -->
         <section>
-            <h3>Търсене на транспорт</h3>
+            <h3 data-i18n="searchTitle">Търсене на транспорт</h3>
+
             <form action="search.php" method="GET">
-                <input type="text" name="query" placeholder="Въведете линия или спирка...">
-                <button type="submit">Търси</button>
+                <input
+                    type="text"
+                    name="query"
+                    placeholder="Въведете линия или спирка..."
+                    data-i18n-placeholder="searchPlaceholder"
+                >
+
+                <button type="submit" data-i18n="searchButton">
+                    Търси
+                </button>
             </form>
         </section>
 
         <br>
 
-        <!-- Бързи връзки -->
+        <!-- Quick links -->
         <section>
-            <h3>Бърз достъп</h3>
+            <h3 data-i18n="quickAccess">Бърз достъп</h3>
+
             <ul>
-                <li><a href="plan.html">Планирайте вашето пътуване</a></li>
-                <li><a href="lines.html">Преглед на всички линии</a></li>
-                <li><a href="stops.html">Преглед на всички спирки</a></li>
-                <li><a href="schedules.html">Разписания по часове</a></li>
+                <li>
+                    <a href="plan.html" data-i18n="planTrip">
+                        Планирайте вашето пътуване
+                    </a>
+                </li>
+
+                <li>
+                    <a href="lines.html" data-i18n="viewLines">
+                        Преглед на всички линии
+                    </a>
+                </li>
+
+                <li>
+                    <a href="stops.html" data-i18n="viewStops">
+                        Преглед на всички спирки
+                    </a>
+                </li>
+
+                <li>
+                    <a href="schedules.html" data-i18n="viewSchedules">
+                        Разписания по часове
+                    </a>
+                </li>
             </ul>
         </section>
 
         <br>
 
-        <!-- Текст за добре дошли -->
+        <!-- Welcome -->
         <section>
-            <h3>Добре дошли</h3>
-            <p>Добре дошли в официалната система за информация на градския транспорт. Тук можете бързо да откриете разписания, маршрути и да планирате пътуването си.</p>
+            <h3 data-i18n="welcomeTitle">Добре дошли</h3>
+
+            <p data-i18n="welcomeText">
+                Добре дошли в официалната система за информация на градския транспорт.
+                Тук можете бързо да откриете разписания, маршрути и да планирате пътуването си.
+            </p>
         </section>
+
     </main>
 
     <hr>
 
-    <!-- 3. Футър -->
+    <!-- Footer -->
     <footer>
-        <p>&copy; 2026 Градски Транспорт - Екип 1, XII "В" клас</p>
+        <p data-i18n="footer">
+            © 2026 Градски Транспорт - Екип 1, XII "В" клас
+        </p>
     </footer>
 
+    <!-- Firebase connection test -->
     <script type="module">
         import { getStops } from "./firebase.js";
 
